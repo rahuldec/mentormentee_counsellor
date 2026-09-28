@@ -3,11 +3,11 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const ROLES = [
-  { key: 'student',    label: 'Student',    icon: '🎓', color: '#4F46E5' },
-  { key: 'employee',   label: 'Employee',   icon: '👔', color: '#0891B2' },
-  { key: 'counsellor', label: 'Counsellor', icon: '🧠', color: '#059669' },
-  { key: 'teacher',    label: 'Teacher',    icon: '📚', color: '#D97706' },
-  { key: 'admin',      label: 'Admin',      icon: '⚙️', color: '#7C3AED' },
+  { key: 'student',    label: 'Student',    icon: '🎓', desc: 'Raise & track counselling requests' },
+  { key: 'employee',   label: 'Employee',   icon: '👔', desc: 'Staff counselling & wellbeing' },
+  { key: 'counsellor', label: 'Counsellor', icon: '🧠', desc: 'Manage & respond to sessions' },
+  { key: 'teacher',    label: 'Teacher',    icon: '📚', desc: 'Refer & monitor student sessions' },
+  { key: 'admin',      label: 'Admin',      icon: '⚙️', desc: 'Dashboard, reports & settings' },
 ];
 
 export default function Home() {
@@ -19,7 +19,6 @@ export default function Home() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    // Strip any value containing '{' — unresolved ERP placeholders
     const clean = (v) => (v && !v.includes('{')) ? v : null;
 
     const regNo  = clean(params.get('regNo'));
@@ -56,17 +55,17 @@ export default function Home() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(150deg, #EEF2FF 0%, #F0F9FF 50%, #F5F3FF 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-      <div style={{ background: 'white', borderRadius: 24, boxShadow: '0 4px 32px rgba(79,70,229,0.12)', padding: '36px 28px', width: '100%', maxWidth: 380 }}>
-        {/* Brand */}
-        <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{ width: 64, height: 64, borderRadius: 18, background: 'linear-gradient(135deg, #4F46E5, #818CF8)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px', boxShadow: '0 4px 16px rgba(79,70,229,0.3)' }}>
-            <svg width="30" height="30" fill="none" stroke="white" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-          </div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#1E2A3B', margin: '0 0 4px' }}>Counselling Portal</h1>
-          <p style={{ fontSize: 13, color: '#94A3B8', margin: 0 }}>Dev access — select your role</p>
+    <div style={{ minHeight: '100vh', background: '#FEF6EE', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      {/* Brand mark */}
+      <div style={{ marginBottom: 24, textAlign: 'center' }}>
+        <div style={{ width: 56, height: 56, borderRadius: 18, background: 'linear-gradient(135deg, #E84A0C, #F97316)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', boxShadow: '0 4px 16px rgba(232,74,12,0.35)' }}>
+          <svg width="28" height="28" fill="none" stroke="white" viewBox="0 0 24 24" strokeWidth="2.2"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
         </div>
+        <div style={{ fontSize: 22, fontWeight: 800, color: '#1A1A1A', letterSpacing: '-0.3px' }}>Counselling Portal</div>
+        <div style={{ fontSize: 13, color: '#B8A99A', marginTop: 3 }}>Student & Staff Wellbeing</div>
+      </div>
 
+      <div style={{ background: 'white', borderRadius: 24, boxShadow: '0 4px 32px rgba(0,0,0,0.08)', padding: '28px 24px', width: '100%', maxWidth: 380 }}>
         {/* Fields */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
           <div>
@@ -83,9 +82,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Role buttons */}
         <label className="label" style={{ marginBottom: 10 }}>Enter as</label>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {ROLES.map(r => (
             <button
               key={r.key}
@@ -93,19 +91,22 @@ export default function Home() {
               disabled={!userId}
               style={{
                 display: 'flex', alignItems: 'center', gap: 12,
-                padding: '12px 16px', borderRadius: 14,
-                border: role === r.key ? `2px solid ${r.color}` : '1.5px solid #E2E8F0',
-                background: role === r.key ? `${r.color}10` : 'white',
-                color: role === r.key ? r.color : '#475569',
-                fontWeight: 600, fontSize: 14, cursor: userId ? 'pointer' : 'not-allowed',
-                opacity: userId ? 1 : 0.5, transition: 'all 0.15s', textAlign: 'left',
+                padding: '11px 14px', borderRadius: 14,
+                border: '1.5px solid #EDE0D4',
+                background: 'white',
+                cursor: userId ? 'pointer' : 'not-allowed',
+                opacity: userId ? 1 : 0.45,
+                transition: 'all 0.15s', textAlign: 'left',
               }}
-              onMouseEnter={e => { if (userId) { e.currentTarget.style.borderColor = r.color; e.currentTarget.style.background = `${r.color}10`; } }}
-              onMouseLeave={e => { if (role !== r.key) { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.background = 'white'; } }}
+              onMouseEnter={e => { if (userId) { e.currentTarget.style.borderColor = '#E84A0C'; e.currentTarget.style.background = '#FFF5F0'; } }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#EDE0D4'; e.currentTarget.style.background = 'white'; }}
             >
               <span style={{ fontSize: 20, width: 28, textAlign: 'center' }}>{r.icon}</span>
-              <span>{r.label}</span>
-              <span style={{ marginLeft: 'auto', fontSize: 18, color: '#CBD5E1' }}>›</span>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 13, color: '#1A1A1A' }}>{r.label}</div>
+                <div style={{ fontSize: 11, color: '#B8A99A', marginTop: 1 }}>{r.desc}</div>
+              </div>
+              <span style={{ marginLeft: 'auto', fontSize: 16, color: '#D4C4B8' }}>›</span>
             </button>
           ))}
         </div>

@@ -7,12 +7,12 @@ import { format } from 'date-fns';
 
 const TABS = ['Pending', 'Upcoming', 'Completed', 'All'];
 
-function Avatar({ name, size = 36 }) {
+function Avatar({ name, size = 38 }) {
   const initials = (name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-  const colors = ['#4F46E5', '#0891B2', '#059669', '#D97706', '#7C3AED', '#DB2777'];
+  const colors = ['#E84A0C', '#D97706', '#2D8A4E', '#7C5CBC', '#DB2777', '#0891B2'];
   const color = colors[(name || '').charCodeAt(0) % colors.length];
   return (
-    <div style={{ width: size, height: size, borderRadius: 10, background: `${color}20`, color, fontSize: size * 0.38, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+    <div style={{ width: size, height: size, borderRadius: 12, background: `${color}18`, color, fontSize: size * 0.38, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: `1.5px solid ${color}30` }}>
       {initials}
     </div>
   );
@@ -40,7 +40,7 @@ export default function CounsellorPage() {
   async function loadCounsellor(uid, email) {
     const res = await fetch('/api/counsellors');
     const counsellors = await res.json();
-    const c = counsellors.find(x => x.employee_id === uid || x.email === email);
+    const c = counsellors.find(x => x.employee_id === uid || x.email === email || x.mobile === uid);
     if (c) { setCounsellorId(c.id); loadSessions(c.id); }
     else setLoading(false);
   }
@@ -87,62 +87,79 @@ export default function CounsellorPage() {
 
   const pendingCount = sessions.filter(s => s.status === 'pending' || s.status === 'reopened').length;
   const filtered = sessions.filter(s => {
-    if (tab === 'Pending') return s.status === 'pending' || s.status === 'reopened';
-    if (tab === 'Upcoming') return s.status === 'accepted' || s.status === 'rescheduled';
+    if (tab === 'Pending')   return s.status === 'pending' || s.status === 'reopened';
+    if (tab === 'Upcoming')  return s.status === 'accepted' || s.status === 'rescheduled';
     if (tab === 'Completed') return s.status === 'completed' || s.status === 'declined';
     return true;
   });
 
-  if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}><div className="spinner" /></div>;
+  if (loading) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#FEF6EE' }}>
+      <div className="spinner" />
+    </div>
+  );
 
   if (!counsellorId) return (
-    <div style={{ minHeight: '100vh', background: '#F0F4FF', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-      <div className="card" style={{ padding: 32, textAlign: 'center', maxWidth: 340 }}>
+    <div style={{ minHeight: '100vh', background: '#FEF6EE', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div className="card" style={{ padding: 32, textAlign: 'center', maxWidth: 340, border: '1.5px solid #F0E6DA' }}>
         <div style={{ fontSize: 48, marginBottom: 12 }}>🔍</div>
-        <div style={{ fontWeight: 700, fontSize: 16, color: '#1E2A3B', marginBottom: 8 }}>Profile Not Found</div>
-        <div style={{ fontSize: 13, color: '#94A3B8', lineHeight: 1.6 }}>Ask admin to add your employee ID: <strong style={{ color: '#4F46E5' }}>{user?.id}</strong></div>
+        <div style={{ fontWeight: 800, fontSize: 16, color: '#1A1A1A', marginBottom: 8 }}>Profile Not Found</div>
+        <div style={{ fontSize: 13, color: '#B8A99A', lineHeight: 1.6 }}>Ask admin to add your employee ID: <strong style={{ color: '#E84A0C' }}>{user?.id}</strong></div>
       </div>
     </div>
   );
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F0F4FF', paddingBottom: 32 }}>
+    <div style={{ minHeight: '100vh', background: '#FEF6EE', paddingBottom: 32 }}>
       {/* Header */}
-      <div className="page-header">
-        <div style={{ maxWidth: 560, margin: '0 auto', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, #059669, #10B981)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      <div style={{ background: '#1A1A1A' }}>
+        <div style={{ maxWidth: 580, margin: '0 auto', padding: '16px 16px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 42, height: 42, borderRadius: 13, background: 'linear-gradient(135deg, #E84A0C, #F97316)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <svg width="20" height="20" fill="white" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>
           </div>
-          <div>
-            <div style={{ fontWeight: 700, fontSize: 15, color: '#1E2A3B' }}>Counsellor Dashboard</div>
-            <div style={{ fontSize: 12, color: '#94A3B8' }}>{user?.name}</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 800, fontSize: 15, color: 'white', letterSpacing: '-0.2px' }}>Counsellor Dashboard</div>
+            <div style={{ fontSize: 12, color: '#F97316', fontWeight: 600, marginTop: 1 }}>{user?.name}</div>
           </div>
           {pendingCount > 0 && (
-            <div style={{ marginLeft: 'auto', background: '#EF4444', color: 'white', fontSize: 12, fontWeight: 700, borderRadius: 20, padding: '3px 10px', minWidth: 28, textAlign: 'center' }}>
+            <div style={{ background: '#E84A0C', color: 'white', fontSize: 12, fontWeight: 800, borderRadius: 20, padding: '3px 10px', minWidth: 28, textAlign: 'center' }}>
               {pendingCount}
             </div>
           )}
         </div>
+
         {/* Tabs */}
-        <div style={{ maxWidth: 560, margin: '0 auto', padding: '0 16px 12px' }}>
-          <div className="pill-tabs">
+        <div style={{ maxWidth: 580, margin: '0 auto', padding: '0 16px 14px' }}>
+          <div className="pill-tabs" style={{ background: 'rgba(255,255,255,0.1)' }}>
             {TABS.map(t => (
-              <button key={t} onClick={() => setTab(t)} className={`pill-tab ${tab === t ? 'active' : ''}`}>
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                style={{
+                  flex: 1, padding: '8px 10px', borderRadius: 9, fontSize: 13, fontWeight: 600,
+                  color: tab === t ? '#E84A0C' : 'rgba(255,255,255,0.55)',
+                  background: tab === t ? 'white' : 'transparent',
+                  border: 'none', cursor: 'pointer', transition: 'all 0.2s', textAlign: 'center', whiteSpace: 'nowrap',
+                  boxShadow: tab === t ? '0 1px 4px rgba(0,0,0,0.15)' : 'none',
+                }}
+              >
                 {t}
                 {t === 'Pending' && pendingCount > 0 && (
-                  <span style={{ marginLeft: 5, background: '#EF4444', color: 'white', fontSize: 10, fontWeight: 700, borderRadius: 10, padding: '1px 5px' }}>{pendingCount}</span>
+                  <span style={{ marginLeft: 5, background: '#E84A0C', color: 'white', fontSize: 10, fontWeight: 800, borderRadius: 10, padding: '1px 5px' }}>{pendingCount}</span>
                 )}
               </button>
             ))}
           </div>
         </div>
+
+        <div style={{ height: 4, background: 'linear-gradient(90deg, #E84A0C, #F97316, #FBBF24)' }} />
       </div>
 
-      <div style={{ maxWidth: 560, margin: '0 auto', padding: '16px 16px 0' }}>
+      <div style={{ maxWidth: 580, margin: '0 auto', padding: '16px 16px 0' }}>
         {filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>✓</div>
-            <div style={{ fontWeight: 600, fontSize: 15, color: '#64748B' }}>No sessions here</div>
+            <div style={{ width: 64, height: 64, borderRadius: 20, background: '#FEE8DC', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px', fontSize: 28 }}>✓</div>
+            <div style={{ fontWeight: 700, fontSize: 15, color: '#8C7B6B' }}>No sessions here</div>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -151,38 +168,37 @@ export default function CounsellorPage() {
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
                   <Avatar name={s.requester_name || s.requester_id} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: 14, color: '#1E2A3B', marginBottom: 2 }}>{s.requester_name || s.requester_id}</div>
-                    <div style={{ fontSize: 11, color: '#94A3B8', textTransform: 'capitalize' }}>{s.requester_type} · {s.categories?.name}</div>
-                    <div style={{ fontSize: 11, color: '#CBD5E1' }}>{format(new Date(s.created_at), 'dd MMM yyyy')}</div>
+                    <div style={{ fontWeight: 700, fontSize: 14, color: '#1A1A1A', marginBottom: 1 }}>{s.requester_name || s.requester_id}</div>
+                    <div style={{ fontSize: 11, color: '#B8A99A', textTransform: 'capitalize', fontWeight: 600 }}>{s.requester_type} · {s.categories?.name}</div>
+                    <div style={{ fontSize: 11, color: '#D4C4B8', marginTop: 1 }}>{format(new Date(s.created_at), 'dd MMM yyyy')}</div>
                   </div>
                   <StatusBadge status={s.status} />
                 </div>
 
                 {s.requester_notes && (
-                  <div style={{ fontSize: 12, color: '#64748B', fontStyle: 'italic', borderLeft: '3px solid #E2E8F0', paddingLeft: 8, marginBottom: 8 }}>
+                  <div style={{ fontSize: 12, color: '#8C7B6B', fontStyle: 'italic', borderLeft: '3px solid #EDE0D4', paddingLeft: 8, marginBottom: 8 }}>
                     "{s.requester_notes}"
                   </div>
                 )}
 
                 {s.scheduled_at && (
-                  <div style={{ background: '#EEF2FF', borderRadius: 8, padding: '7px 10px', fontSize: 12, color: '#4338CA', marginBottom: 8 }}>
+                  <div style={{ background: '#FFF5F0', borderRadius: 8, padding: '7px 10px', fontSize: 12, color: '#C04010', marginBottom: 8, fontWeight: 600 }}>
                     📅 {format(new Date(s.scheduled_at), 'dd MMM yyyy, hh:mm a')}
-                    {s.location && <span> · 📍 {s.location}</span>}
+                    {s.location && <span style={{ color: '#8C7B6B', fontWeight: 400 }}> · 📍 {s.location}</span>}
                   </div>
                 )}
 
                 {s.referred_by_name && (
-                  <div style={{ fontSize: 12, color: '#7C3AED', marginBottom: 8 }}>↗ Referred by {s.referred_by_name}</div>
+                  <div style={{ fontSize: 12, color: '#7C5CBC', marginBottom: 8 }}>↗ Referred by {s.referred_by_name}</div>
                 )}
 
                 {s.remarks && (
-                  <div style={{ background: '#F0FDF4', borderRadius: 8, padding: '8px 10px', marginBottom: 8 }}>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: '#166534', marginBottom: 4 }}>Remarks saved</div>
+                  <div style={{ background: '#F0FDF4', borderRadius: 8, padding: '8px 10px', marginBottom: 8, border: '1px solid #D1FAE5' }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#166534', marginBottom: 4 }}>Remarks saved</div>
                     <WellbeingStars value={s.remarks.counsellor_wellbeing_score} readOnly />
                   </div>
                 )}
 
-                {/* Actions */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
                   {(s.status === 'pending' || s.status === 'reopened') && (
                     <>
@@ -211,17 +227,19 @@ export default function CounsellorPage() {
 
       {/* Modals */}
       {actionModal && (
-        <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) { setActionModal(null); } }}>
+        <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) setActionModal(null); }}>
           <div className="modal">
             {(actionModal.type === 'accept' || actionModal.type === 'reschedule') && (
               <>
-                <div style={{ fontWeight: 700, fontSize: 17, color: '#1E2A3B', marginBottom: 4 }}>{actionModal.type === 'accept' ? 'Accept Session' : 'Reschedule Session'}</div>
-                <div style={{ fontSize: 13, color: '#94A3B8', marginBottom: 20 }}>For {actionModal.session.requester_name}</div>
+                <div style={{ fontWeight: 800, fontSize: 17, color: '#1A1A1A', marginBottom: 2 }}>
+                  {actionModal.type === 'accept' ? 'Accept Session' : 'Reschedule Session'}
+                </div>
+                <div style={{ fontSize: 13, color: '#B8A99A', marginBottom: 20 }}>For {actionModal.session.requester_name}</div>
                 <form onSubmit={handleAction} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   <div><label className="label">Date & Time</label><input type="datetime-local" className="input" style={{ marginTop: 6 }} value={form.scheduled_at || ''} onChange={e => setForm({ ...form, scheduled_at: e.target.value })} required /></div>
                   <div><label className="label">Location</label><input type="text" className="input" style={{ marginTop: 6 }} value={form.location || ''} onChange={e => setForm({ ...form, location: e.target.value })} placeholder="e.g. Room 204, Block A" /></div>
-                  <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-                    <button type="submit" disabled={submitting} className="btn-success" style={{ flex: 1, padding: '11px 0', fontSize: 14 }}>{submitting ? 'Saving...' : 'Confirm'}</button>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button type="submit" disabled={submitting} className="btn-success" style={{ flex: 1, padding: '12px 0', fontSize: 14 }}>{submitting ? 'Saving...' : 'Confirm'}</button>
                     <button type="button" className="btn-ghost" onClick={() => setActionModal(null)}>Cancel</button>
                   </div>
                 </form>
@@ -229,12 +247,12 @@ export default function CounsellorPage() {
             )}
             {actionModal.type === 'decline' && (
               <>
-                <div style={{ fontWeight: 700, fontSize: 17, color: '#1E2A3B', marginBottom: 4 }}>Decline Session</div>
-                <div style={{ fontSize: 13, color: '#94A3B8', marginBottom: 20 }}>From {actionModal.session.requester_name}</div>
+                <div style={{ fontWeight: 800, fontSize: 17, color: '#1A1A1A', marginBottom: 2 }}>Decline Session</div>
+                <div style={{ fontSize: 13, color: '#B8A99A', marginBottom: 20 }}>From {actionModal.session.requester_name}</div>
                 <form onSubmit={handleAction} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   <div><label className="label">Reason (optional)</label><textarea className="input" style={{ marginTop: 6 }} value={form.decline_reason || ''} onChange={e => setForm({ ...form, decline_reason: e.target.value })} rows={3} placeholder="Reason for declining..." /></div>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <button type="submit" disabled={submitting} className="btn-danger" style={{ flex: 1, padding: '11px 0', fontSize: 14, background: '#EF4444', color: 'white', borderColor: '#EF4444' }}>{submitting ? 'Saving...' : 'Decline'}</button>
+                    <button type="submit" disabled={submitting} style={{ flex: 1, padding: '12px 0', fontSize: 14, background: '#C0392B', color: 'white', fontWeight: 700, border: 'none', borderRadius: 12, cursor: 'pointer' }}>{submitting ? 'Saving...' : 'Decline'}</button>
                     <button type="button" className="btn-ghost" onClick={() => setActionModal(null)}>Cancel</button>
                   </div>
                 </form>
@@ -242,10 +260,10 @@ export default function CounsellorPage() {
             )}
             {actionModal.type === 'remarks' && (
               <>
-                <div style={{ fontWeight: 700, fontSize: 17, color: '#1E2A3B', marginBottom: 4 }}>Session Remarks</div>
-                <div style={{ fontSize: 13, color: '#94A3B8', marginBottom: 20 }}>For {actionModal.session.requester_name}</div>
+                <div style={{ fontWeight: 800, fontSize: 17, color: '#1A1A1A', marginBottom: 2 }}>Session Remarks</div>
+                <div style={{ fontSize: 13, color: '#B8A99A', marginBottom: 20 }}>For {actionModal.session.requester_name}</div>
                 <form onSubmit={saveRemarks} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  <div><label className="label">Counsellor Notes</label><textarea className="input" style={{ marginTop: 6 }} value={form.counsellor_notes || ''} onChange={e => setForm({ ...form, counsellor_notes: e.target.value })} rows={3} placeholder="Session observations and notes..." /></div>
+                  <div><label className="label">Counsellor Notes</label><textarea className="input" style={{ marginTop: 6 }} value={form.counsellor_notes || ''} onChange={e => setForm({ ...form, counsellor_notes: e.target.value })} rows={3} placeholder="Session observations..." /></div>
                   <div><label className="label">Student's Notes / Shared</label><textarea className="input" style={{ marginTop: 6 }} value={form.student_notes || ''} onChange={e => setForm({ ...form, student_notes: e.target.value })} rows={2} placeholder="What the student shared..." /></div>
                   <div>
                     <label className="label" style={{ marginBottom: 8 }}>Counsellor Wellbeing Score</label>
@@ -255,8 +273,8 @@ export default function CounsellorPage() {
                     <label className="label" style={{ marginBottom: 8 }}>Student Self-Reported Score</label>
                     <WellbeingStars value={form.student_wellbeing_score} onChange={v => setForm({ ...form, student_wellbeing_score: v })} />
                   </div>
-                  <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-                    <button type="submit" disabled={submitting} className="btn-primary" style={{ flex: 1, padding: '11px 0', fontSize: 14 }}>{submitting ? 'Saving...' : 'Save Remarks'}</button>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button type="submit" disabled={submitting} className="btn-primary" style={{ flex: 1, padding: '12px 0', fontSize: 14 }}>{submitting ? 'Saving...' : 'Save Remarks'}</button>
                     <button type="button" className="btn-ghost" onClick={() => setActionModal(null)}>Cancel</button>
                   </div>
                 </form>

@@ -101,28 +101,28 @@ export default function AdminPage() {
     setReassignModal(null); loadAll();
   }
 
-  if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}><div className="spinner" /></div>;
+  if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#FEF6EE' }}><div className="spinner" /></div>;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F0F4FF', paddingBottom: 32 }}>
+    <div style={{ minHeight: '100vh', background: '#FEF6EE', paddingBottom: 32 }}>
       {/* Header */}
-      <div className="page-header">
-        <div style={{ maxWidth: 680, margin: '0 auto', padding: '14px 16px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, #7C3AED, #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>⚙️</div>
+      <div style={{ background: '#1A1A1A' }}>
+        <div style={{ maxWidth: 680, margin: '0 auto', padding: '16px 16px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+            <div style={{ width: 42, height: 42, borderRadius: 13, background: 'linear-gradient(135deg, #E84A0C, #F97316)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>⚙️</div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 15, color: '#1E2A3B' }}>Admin Dashboard</div>
-              <div style={{ fontSize: 12, color: '#94A3B8' }}>{user?.name} · {sessions.length} sessions total</div>
+              <div style={{ fontWeight: 800, fontSize: 15, color: 'white', letterSpacing: '-0.2px' }}>Admin Dashboard</div>
+              <div style={{ fontSize: 12, color: '#F97316', fontWeight: 600 }}>{user?.name} · {sessions.length} sessions total</div>
             </div>
           </div>
           {/* Tabs */}
-          <div style={{ display: 'flex', gap: 0, overflowX: 'auto', paddingBottom: 0 }}>
+          <div style={{ display: 'flex', gap: 0, overflowX: 'auto' }}>
             {TABS.map(t => (
               <button key={t.key} onClick={() => setTab(t.key)} style={{
-                padding: '8px 14px', fontSize: 13, fontWeight: tab === t.key ? 600 : 400,
-                color: tab === t.key ? '#4F46E5' : '#64748B',
-                borderBottom: tab === t.key ? '2.5px solid #4F46E5' : '2.5px solid transparent',
-                background: 'none', border: 'none', borderBottom: tab === t.key ? '2.5px solid #4F46E5' : '2.5px solid transparent',
+                padding: '9px 14px', fontSize: 13, fontWeight: tab === t.key ? 700 : 500,
+                color: tab === t.key ? '#E84A0C' : 'rgba(255,255,255,0.5)',
+                borderBottom: tab === t.key ? '2.5px solid #E84A0C' : '2.5px solid transparent',
+                background: 'none', border: 'none',
                 cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.15s',
               }}>
                 {t.icon} {t.key}
@@ -130,11 +130,12 @@ export default function AdminPage() {
             ))}
           </div>
         </div>
+        <div style={{ height: 4, background: 'linear-gradient(90deg, #E84A0C, #F97316, #FBBF24)' }} />
       </div>
 
       <div style={{ maxWidth: 680, margin: '0 auto', padding: '16px 16px 0' }}>
         {msg.text && (
-          <div style={{ background: msg.type === 'error' ? '#FFF1F2' : '#ECFDF5', border: `1px solid ${msg.type === 'error' ? '#FFE4E6' : '#A7F3D0'}`, color: msg.type === 'error' ? '#E11D48' : '#065F46', borderRadius: 12, padding: '11px 16px', fontSize: 13, fontWeight: 500, marginBottom: 12 }}>
+          <div style={{ background: msg.type === 'error' ? '#FEF0F0' : '#ECFDF5', border: `1px solid ${msg.type === 'error' ? '#FADADD' : '#A7F3D0'}`, color: msg.type === 'error' ? '#C0392B' : '#166534', borderRadius: 12, padding: '11px 16px', fontSize: 13, fontWeight: 600, marginBottom: 12 }}>
             {msg.type === 'error' ? '✗' : '✓'} {msg.text}
           </div>
         )}
@@ -148,13 +149,13 @@ export default function AdminPage() {
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 600, fontSize: 14, color: '#1E2A3B' }}>{s.requester_name || s.requester_id} <span style={{ fontWeight: 400, fontSize: 12, color: '#94A3B8' }}>({s.requester_type})</span></div>
                     <div style={{ fontSize: 12, color: '#64748B' }}>{s.categories?.name} · {format(new Date(s.created_at), 'dd MMM yyyy')}</div>
-                    {s.counsellors && <div style={{ fontSize: 12, color: '#4F46E5', marginTop: 2 }}>Counsellor: {s.counsellors.name}</div>}
+                    {s.counsellors && <div style={{ fontSize: 12, color: '#E84A0C', marginTop: 2, fontWeight: 600 }}>Counsellor: {s.counsellors.name}</div>}
                     {s.scheduled_at && <div style={{ fontSize: 12, color: '#64748B', marginTop: 2 }}>📅 {format(new Date(s.scheduled_at), 'dd MMM yyyy, hh:mm a')}</div>}
                     {s.remarks && <div style={{ marginTop: 4 }}><WellbeingStars value={s.remarks.counsellor_wellbeing_score} readOnly /></div>}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
                     <StatusBadge status={s.status} />
-                    <button onClick={() => { setReassignModal(s); setNewCounsellorId(s.counsellor_id || ''); }} style={{ fontSize: 11, color: '#4F46E5', background: '#EEF2FF', border: 'none', borderRadius: 7, padding: '4px 10px', cursor: 'pointer', fontWeight: 500 }}>Reassign</button>
+                    <button onClick={() => { setReassignModal(s); setNewCounsellorId(s.counsellor_id || ''); }} style={{ fontSize: 11, color: '#E84A0C', background: '#FEF0E8', border: 'none', borderRadius: 7, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 }}>Reassign</button>
                   </div>
                 </div>
               </div>
@@ -166,7 +167,7 @@ export default function AdminPage() {
         {tab === 'Reports' && (
           <div>
             <div className="card" style={{ padding: 20, marginBottom: 16 }}>
-              <div style={{ fontWeight: 700, fontSize: 15, color: '#1E2A3B', marginBottom: 16 }}>Generate Report</div>
+              <div style={{ fontWeight: 800, fontSize: 15, color: '#1A1A1A', marginBottom: 16 }}>Generate Report</div>
               <form onSubmit={runReport} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div>
                   <label className="label">Report Type</label>
@@ -201,8 +202,8 @@ export default function AdminPage() {
               <div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 16 }}>
                   {[
-                    { label: 'Total Sessions', value: reportData.stats.total, color: '#4F46E5' },
-                    { label: 'Completed', value: reportData.stats.byStatus.completed || 0, color: '#059669' },
+                    { label: 'Total Sessions', value: reportData.stats.total, color: '#E84A0C' },
+                    { label: 'Completed', value: reportData.stats.byStatus.completed || 0, color: '#2D8A4E' },
                     { label: 'Avg Wellbeing', value: reportData.stats.avgWellbeing || '—', color: '#F59E0B' },
                   ].map(stat => (
                     <div key={stat.label} className="card" style={{ padding: '14px 10px', textAlign: 'center' }}>
@@ -232,7 +233,7 @@ export default function AdminPage() {
         {tab === 'Counsellors' && (
           <div>
             <div className="card" style={{ padding: 20, marginBottom: 14 }}>
-              <div style={{ fontWeight: 700, fontSize: 15, color: '#1E2A3B', marginBottom: 16 }}>Add Counsellor</div>
+              <div style={{ fontWeight: 800, fontSize: 15, color: '#1A1A1A', marginBottom: 16 }}>Add Counsellor</div>
               <form onSubmit={addCounsellor} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <div><label className="label">Name</label><input type="text" className="input" style={{ marginTop: 6 }} value={newCounsellor.name} onChange={e => setNewCounsellor({ ...newCounsellor, name: e.target.value })} required /></div>
@@ -247,15 +248,15 @@ export default function AdminPage() {
               {counsellors.map(c => (
                 <div key={c.id} className="card" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: 10, background: '#EEF2FF', color: '#4F46E5', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: '#FEE8DC', color: '#E84A0C', fontSize: 14, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {(c.name || '?')[0].toUpperCase()}
                     </div>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: 14, color: '#1E2A3B' }}>{c.name}</div>
-                      <div style={{ fontSize: 12, color: '#94A3B8' }}>{c.email}{c.employee_id && ` · ${c.employee_id}`}{c.mobile && ` · 📱 ${c.mobile}`}</div>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: '#1A1A1A' }}>{c.name}</div>
+                      <div style={{ fontSize: 12, color: '#B8A99A' }}>{c.email}{c.employee_id && ` · ${c.employee_id}`}{c.mobile && ` · 📱 ${c.mobile}`}</div>
                     </div>
                   </div>
-                  <button onClick={() => deleteCounsellor(c.id)} style={{ fontSize: 12, color: '#E11D48', background: '#FFF1F2', border: '1px solid #FFE4E6', borderRadius: 8, padding: '5px 10px', cursor: 'pointer' }}>Remove</button>
+                  <button onClick={() => deleteCounsellor(c.id)} style={{ fontSize: 12, color: '#C0392B', background: '#FEF0F0', border: '1px solid #FADADD', borderRadius: 8, padding: '5px 10px', cursor: 'pointer', fontWeight: 600 }}>Remove</button>
                 </div>
               ))}
             </div>
@@ -266,7 +267,7 @@ export default function AdminPage() {
         {tab === 'Categories' && (
           <div>
             <div className="card" style={{ padding: 20, marginBottom: 14 }}>
-              <div style={{ fontWeight: 700, fontSize: 15, color: '#1E2A3B', marginBottom: 14 }}>Add Category</div>
+              <div style={{ fontWeight: 800, fontSize: 15, color: '#1A1A1A', marginBottom: 14 }}>Add Category</div>
               <form onSubmit={addCategory} style={{ display: 'flex', gap: 8 }}>
                 <input type="text" className="input" value={newCategory} onChange={e => setNewCategory(e.target.value)} placeholder="Category name" required />
                 <button type="submit" disabled={submitting} className="btn-primary" style={{ whiteSpace: 'nowrap' }}>Add</button>
@@ -276,10 +277,10 @@ export default function AdminPage() {
               {categories.map(c => (
                 <div key={c.id} className="card" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#4F46E5' }} />
-                    <span style={{ fontSize: 14, fontWeight: 500, color: '#1E2A3B' }}>{c.name}</span>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#E84A0C' }} />
+                    <span style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A' }}>{c.name}</span>
                   </div>
-                  <button onClick={() => deleteCategory(c.id)} style={{ fontSize: 12, color: '#E11D48', background: '#FFF1F2', border: '1px solid #FFE4E6', borderRadius: 8, padding: '5px 10px', cursor: 'pointer' }}>Remove</button>
+                  <button onClick={() => deleteCategory(c.id)} style={{ fontSize: 12, color: '#C0392B', background: '#FEF0F0', border: '1px solid #FADADD', borderRadius: 8, padding: '5px 10px', cursor: 'pointer', fontWeight: 600 }}>Remove</button>
                 </div>
               ))}
             </div>
@@ -290,7 +291,7 @@ export default function AdminPage() {
         {tab === 'Mapping' && (
           <div>
             <div className="card" style={{ padding: 20, marginBottom: 14 }}>
-              <div style={{ fontWeight: 700, fontSize: 15, color: '#1E2A3B', marginBottom: 16 }}>Map Category → Counsellor</div>
+              <div style={{ fontWeight: 800, fontSize: 15, color: '#1A1A1A', marginBottom: 16 }}>Map Category → Counsellor</div>
               <form onSubmit={addMapping} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div>
                   <label className="label">Category</label>
@@ -313,8 +314,8 @@ export default function AdminPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {categories.filter(c => c.category_counsellor_map?.length > 0).map(cat => (
                 <div key={cat.id} className="card" style={{ padding: '14px 16px' }}>
-                  <div style={{ fontWeight: 600, fontSize: 13, color: '#1E2A3B', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4F46E5', display: 'inline-block' }} />
+                  <div style={{ fontWeight: 700, fontSize: 13, color: '#1A1A1A', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#E84A0C', display: 'inline-block' }} />
                     {cat.name}
                   </div>
                   {cat.category_counsellor_map.map(m => (
@@ -337,8 +338,8 @@ export default function AdminPage() {
       {reassignModal && (
         <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) setReassignModal(null); }}>
           <div className="modal">
-            <div style={{ fontWeight: 700, fontSize: 17, color: '#1E2A3B', marginBottom: 4 }}>Reassign Counsellor</div>
-            <div style={{ fontSize: 13, color: '#94A3B8', marginBottom: 20 }}>{reassignModal.requester_name} · {reassignModal.categories?.name}</div>
+            <div style={{ fontWeight: 800, fontSize: 17, color: '#1A1A1A', marginBottom: 4 }}>Reassign Counsellor</div>
+            <div style={{ fontSize: 13, color: '#B8A99A', marginBottom: 20 }}>{reassignModal.requester_name} · {reassignModal.categories?.name}</div>
             <form onSubmit={reassign} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <select className="input" value={newCounsellorId} onChange={e => setNewCounsellorId(e.target.value)} required>
                 <option value="">Select counsellor...</option>
