@@ -11,7 +11,7 @@ export default function EmployeePage() {
   useEffect(() => {
     const uid = sessionStorage.getItem('user_id');
     const email = sessionStorage.getItem('email');
-    if (!uid) { router.push('/'); return; }
+    if (!uid || uid.includes('{')) { sessionStorage.clear(); router.push('/'); return; }
 
     fetch('/api/counsellors')
       .then(r => r.json())
@@ -35,8 +35,8 @@ export default function EmployeePage() {
 
   if (checking) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#F0F4FF' }}>
+        <div className="spinner" />
       </div>
     );
   }

@@ -31,7 +31,8 @@ export default function StudentPage() {
 
   useEffect(() => {
     const uid = sessionStorage.getItem('user_id');
-    if (!uid) { router.push('/'); return; }
+    // Reject unresolved ERP placeholders stored from a previous bad visit
+    if (!uid || uid.includes('{')) { sessionStorage.clear(); router.push('/'); return; }
     const storedName = sessionStorage.getItem('name');
     const displayName = (storedName && !storedName.includes('{')) ? storedName : uid;
     const u = { id: uid, name: displayName, email: sessionStorage.getItem('email') || '', role: sessionStorage.getItem('role') || 'student' };

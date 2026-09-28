@@ -19,10 +19,13 @@ export default function Home() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const regNo  = params.get('regNo');
-    const mobile = params.get('mobile');
-    const n = params.get('name');
-    const e = params.get('email');
+    // Strip any value containing '{' — unresolved ERP placeholders
+    const clean = (v) => (v && !v.includes('{')) ? v : null;
+
+    const regNo  = clean(params.get('regNo'));
+    const mobile = clean(params.get('mobile'));
+    const n      = clean(params.get('name'));
+    const e      = clean(params.get('email'));
 
     if (regNo) {
       sessionStorage.setItem('user_id', regNo);
@@ -31,8 +34,8 @@ export default function Home() {
       if (e) sessionStorage.setItem('email', e);
       router.push('/student');
     } else if (mobile) {
-      const empId = params.get('empId') || params.get('emp_id');
-      const resolvedId = (empId && !empId.includes('{')) ? empId : mobile;
+      const empId = clean(params.get('empId') || params.get('emp_id'));
+      const resolvedId = empId || mobile;
       sessionStorage.setItem('user_id', resolvedId);
       sessionStorage.setItem('role', 'employee');
       if (n) sessionStorage.setItem('name', n);
