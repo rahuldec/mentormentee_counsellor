@@ -130,18 +130,19 @@ export default function AdminPage() {
         className="admin-sidebar"
       >
         {/* Brand */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 10px 22px', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: 14 }}>
-          <img src="https://okiedokie-erp-images.s3.ap-south-1.amazonaws.com/Okie%20Dokie/2025/12/sourceURL/26aebcbe10f4ac5a3e8b-611ed1b9032568edd4f3-Okie_Dokie_App_icon__2___2_-removebg-preview.png" alt="OkieDokie" style={{ width: 40, height: 40, borderRadius: 12, flexShrink: 0, objectFit: 'contain', background: 'white', padding: 3 }} />
-          <div>
-            <div style={{ fontWeight: 600, fontSize: 14, letterSpacing: '-0.2px' }}>Admin Panel</div>
-            <div style={{ color: '#8E8E93', fontSize: 11, marginTop: 2 }}>Counselling Portal</div>
+        <div style={{ padding: '4px 10px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <img src="https://okiedokie-erp-images.s3.ap-south-1.amazonaws.com/Okie%20Dokie/2025/12/sourceURL/26aebcbe10f4ac5a3e8b-611ed1b9032568edd4f3-Okie_Dokie_App_icon__2___2_-removebg-preview.png" alt="OkieDokie" style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, objectFit: 'contain', background: 'white', padding: 3 }} />
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 17, color: '#FFFFFF', letterSpacing: '-0.3px', lineHeight: 1.2 }}>Okie Dokie</div>
+              <div style={{ color: '#E84A0C', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', marginTop: 2 }}>Counseling · Admin</div>
+            </div>
           </div>
         </div>
 
-        <div style={{ color: '#636366', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0 12px 8px' }}>Workspace</div>
-
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {NAV.map(n => (
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <div style={{ color: '#48484A', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '6px 12px 6px' }}>Operations</div>
+          {[{ key: 'Sessions', icon: '◷', label: 'Sessions' }, { key: 'Reports', icon: '▥', label: 'Reports' }].map(n => (
             <button key={n.key} onClick={() => { setTab(n.key); setSidebarOpen(false); }} style={{
               height: 40, display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px',
               borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: 13.5, fontWeight: 500,
@@ -154,6 +155,19 @@ export default function AdminPage() {
               {n.key === 'Sessions' && pending > 0 && (
                 <span style={{ marginLeft: 'auto', background: tab === 'Sessions' ? 'rgba(255,255,255,0.25)' : '#3A3A3C', color: 'white', fontSize: 11, fontWeight: 700, borderRadius: 8, padding: '1px 7px' }}>{pending}</span>
               )}
+            </button>
+          ))}
+          <div style={{ color: '#48484A', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '12px 12px 6px' }}>Administration</div>
+          {[{ key: 'Counsellors', icon: '👤', label: 'Counsellors' }, { key: 'Categories', icon: '🏷️', label: 'Categories' }, { key: 'Mapping', icon: '⇄', label: 'Mapping' }].map(n => (
+            <button key={n.key} onClick={() => { setTab(n.key); setSidebarOpen(false); }} style={{
+              height: 40, display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px',
+              borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: 13.5, fontWeight: 500,
+              background: tab === n.key ? '#E84A0C' : 'transparent',
+              color: tab === n.key ? 'white' : '#8E8E93',
+              fontFamily: SF, transition: 'all 0.15s', textAlign: 'left', width: '100%',
+            }}>
+              <span style={{ width: 18, textAlign: 'center', fontSize: 14 }}>{n.icon}</span>
+              <span>{n.label}</span>
             </button>
           ))}
         </nav>
@@ -183,7 +197,7 @@ export default function AdminPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <button onClick={() => setSidebarOpen(o => !o)} className="hamburger" style={{ display: 'none', background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#1C1C1E', padding: 4 }}>☰</button>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 17, color: '#000000', letterSpacing: '-0.4px' }}>{NAV.find(n => n.key === tab)?.label}</div>
+              <div style={{ fontWeight: 700, fontSize: 17, color: '#000000', letterSpacing: '-0.4px' }}>{tab}</div>
               <div style={{ fontSize: 11, color: '#8E8E93', marginTop: 1 }}>{sessions.length} total sessions · {counsellors.length} counsellors</div>
             </div>
           </div>

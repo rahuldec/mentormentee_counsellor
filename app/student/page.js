@@ -94,18 +94,28 @@ export default function StudentPage() {
       {/* SIDEBAR */}
       <aside style={{ position: 'fixed', left: 0, top: 0, width: 230, height: '100vh', background: '#1C1C1E', display: 'flex', flexDirection: 'column', zIndex: 40, padding: '20px 10px' }} className="st-sidebar">
 
-        {/* Profile */}
-        <div style={{ padding: '4px 10px 22px', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: 14 }}>
+        {/* Brand */}
+        <div style={{ padding: '4px 10px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <img src="https://okiedokie-erp-images.s3.ap-south-1.amazonaws.com/Okie%20Dokie/2025/12/sourceURL/26aebcbe10f4ac5a3e8b-611ed1b9032568edd4f3-Okie_Dokie_App_icon__2___2_-removebg-preview.png" alt="OkieDokie" style={{ width: 40, height: 40, borderRadius: 12, flexShrink: 0, objectFit: 'contain', background: 'white', padding: 3 }} />
+            <img src="https://okiedokie-erp-images.s3.ap-south-1.amazonaws.com/Okie%20Dokie/2025/12/sourceURL/26aebcbe10f4ac5a3e8b-611ed1b9032568edd4f3-Okie_Dokie_App_icon__2___2_-removebg-preview.png" alt="OkieDokie" style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, objectFit: 'contain', background: 'white', padding: 3 }} />
             <div>
-              <div style={{ fontWeight: 600, fontSize: 14, color: '#FFFFFF', letterSpacing: '-0.2px' }}>{user?.name}</div>
-              <div style={{ fontSize: 11, color: '#8E8E93', marginTop: 2, textTransform: 'capitalize' }}>{user?.role}</div>
+              <div style={{ fontWeight: 700, fontSize: 17, color: '#FFFFFF', letterSpacing: '-0.3px', lineHeight: 1.2 }}>Okie Dokie</div>
+              <div style={{ color: '#E84A0C', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', marginTop: 2 }}>Counseling</div>
+            </div>
+          </div>
+          <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 28, height: 28, borderRadius: 8, background: '#3A3A3C', color: '#E84A0C', fontSize: 11, fontWeight: 700, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+              {(user?.name || '?')[0].toUpperCase()}
+            </div>
+            <div>
+              <div style={{ fontSize: 12.5, fontWeight: 600, color: '#FFFFFF' }}>{user?.name}</div>
+              <div style={{ fontSize: 10, color: '#8E8E93', textTransform: 'capitalize' }}>{user?.role}</div>
             </div>
           </div>
         </div>
 
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <div style={{ color: '#48484A', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '6px 12px 6px' }}>My Counselling</div>
           {NAV.map(n => (
             <button key={n.key} onClick={() => { setTab(n.key); setSidebarOpen(false); }} style={{
               height: 40, display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px',
