@@ -17,7 +17,7 @@ export default function EmployeePage() {
       .then(r => r.json())
       .then(counsellors => {
         const found = counsellors.some(
-          c => c.employee_id === uid || c.email === email
+          c => c.employee_id === uid || c.email === email || c.mobile === uid
         );
         if (found) {
           sessionStorage.setItem('role', 'counsellor');
