@@ -5,6 +5,8 @@ import StatusBadge from '@/components/StatusBadge';
 import WellbeingStars from '@/components/WellbeingStars';
 import { format } from 'date-fns';
 
+const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif';
+
 const NAV = [
   { key: 'Sessions',    icon: '◷', label: 'Sessions' },
   { key: 'Counsellors', icon: '👤', label: 'Counsellors' },
@@ -106,13 +108,13 @@ export default function AdminPage() {
   const completed = sessions.filter(s => s.status === 'completed').length;
 
   if (loading) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#F5F5F5' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#F2F2F7', fontFamily: SF }}>
       <div className="spinner" />
     </div>
   );
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#F5F5F5', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#F2F2F7', fontFamily: SF }}>
 
       {/* Mobile overlay */}
       {sidebarOpen && (
@@ -122,54 +124,47 @@ export default function AdminPage() {
       {/* SIDEBAR */}
       <aside style={{
         position: 'fixed', left: 0, top: 0, width: 240, height: '100vh',
-        background: '#111827', color: 'white', display: 'flex', flexDirection: 'column',
-        zIndex: 40, padding: '20px 12px',
-        transform: sidebarOpen ? 'translateX(0)' : undefined,
+        background: '#1C1C1E', color: 'white', display: 'flex', flexDirection: 'column',
+        zIndex: 40, padding: '20px 10px',
       }}
         className="admin-sidebar"
       >
         {/* Brand */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '0 10px 24px' }}>
-          <div style={{ width: 38, height: 38, borderRadius: 11, background: 'linear-gradient(135deg, #E84A0C, #F97316)', display: 'grid', placeItems: 'center', fontSize: 18, flexShrink: 0 }}>⚙️</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 10px 22px', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: 14 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 20, background: 'linear-gradient(135deg, #E84A0C, #FF6B35)', display: 'grid', placeItems: 'center', fontSize: 18, flexShrink: 0 }}>⚙️</div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 14 }}>Admin Panel</div>
-            <div style={{ color: '#9CA3AF', fontSize: 11, marginTop: 2 }}>Counselling Portal</div>
+            <div style={{ fontWeight: 600, fontSize: 14, letterSpacing: '-0.2px' }}>Admin Panel</div>
+            <div style={{ color: '#8E8E93', fontSize: 11, marginTop: 2 }}>Counselling Portal</div>
           </div>
         </div>
 
-        <div style={{ color: '#6B7280', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0 12px 8px' }}>Workspace</div>
+        <div style={{ color: '#636366', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0 12px 8px' }}>Workspace</div>
 
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {NAV.map(n => (
             <button key={n.key} onClick={() => { setTab(n.key); setSidebarOpen(false); }} style={{
-              height: 42, display: 'flex', alignItems: 'center', gap: 11, padding: '0 12px',
-              borderRadius: 9, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 500,
+              height: 40, display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px',
+              borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: 13.5, fontWeight: 500,
               background: tab === n.key ? '#E84A0C' : 'transparent',
-              color: tab === n.key ? 'white' : '#9CA3AF',
-              transition: 'all 0.15s', textAlign: 'left', width: '100%',
-            }}
-              onMouseEnter={e => { if (tab !== n.key) { e.currentTarget.style.background = '#1F2937'; e.currentTarget.style.color = 'white'; } }}
-              onMouseLeave={e => { if (tab !== n.key) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#9CA3AF'; } }}
-            >
-              <span style={{ width: 20, textAlign: 'center', fontSize: 15 }}>{n.icon}</span>
+              color: tab === n.key ? 'white' : '#8E8E93',
+              fontFamily: SF, transition: 'all 0.15s', textAlign: 'left', width: '100%',
+            }}>
+              <span style={{ width: 18, textAlign: 'center', fontSize: 14 }}>{n.icon}</span>
               <span>{n.label}</span>
               {n.key === 'Sessions' && pending > 0 && (
-                <span style={{ marginLeft: 'auto', background: tab === n.key ? 'rgba(255,255,255,0.3)' : '#E84A0C', color: 'white', fontSize: 10, fontWeight: 800, borderRadius: 10, padding: '1px 6px' }}>{pending}</span>
+                <span style={{ marginLeft: 'auto', background: tab === 'Sessions' ? 'rgba(255,255,255,0.25)' : '#3A3A3C', color: 'white', fontSize: 11, fontWeight: 700, borderRadius: 8, padding: '1px 7px' }}>{pending}</span>
               )}
             </button>
           ))}
         </nav>
 
-        <div style={{ marginTop: 'auto', borderTop: '1px solid #273244', paddingTop: 14 }}>
+        <div style={{ marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 14 }}>
           <button onClick={() => router.push('/')} style={{
-            height: 42, display: 'flex', alignItems: 'center', gap: 11, padding: '0 12px',
-            borderRadius: 9, border: 'none', cursor: 'pointer', fontSize: 13, color: '#9CA3AF',
-            background: 'transparent', width: '100%', transition: 'all 0.15s',
-          }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#1F2937'; e.currentTarget.style.color = 'white'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#9CA3AF'; }}
-          >
-            <span style={{ width: 20, textAlign: 'center' }}>↪</span>
+            height: 40, display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px',
+            borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: 13.5, color: '#8E8E93',
+            background: 'transparent', width: '100%', fontFamily: SF, transition: 'all 0.15s',
+          }}>
+            <span style={{ width: 18, textAlign: 'center' }}>↪</span>
             <span>Back to Portal</span>
           </button>
         </div>
@@ -180,32 +175,32 @@ export default function AdminPage() {
 
         {/* TOPBAR */}
         <header style={{
-          height: 64, background: 'white', borderBottom: '1px solid #E5E7EB',
+          height: 56, background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '0.5px solid rgba(60,60,67,0.18)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 28px', position: 'sticky', top: 0, zIndex: 10,
+          padding: '0 24px', position: 'sticky', top: 0, zIndex: 10,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            {/* Mobile hamburger */}
-            <button onClick={() => setSidebarOpen(o => !o)} className="hamburger" style={{ display: 'none', background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#374151' }}>☰</button>
+            <button onClick={() => setSidebarOpen(o => !o)} className="hamburger" style={{ display: 'none', background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#1C1C1E', padding: 4 }}>☰</button>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 16, color: '#111827', letterSpacing: '-0.3px' }}>{NAV.find(n => n.key === tab)?.label}</div>
-              <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 1 }}>{sessions.length} total sessions · {counsellors.length} counsellors</div>
+              <div style={{ fontWeight: 700, fontSize: 17, color: '#000000', letterSpacing: '-0.4px' }}>{NAV.find(n => n.key === tab)?.label}</div>
+              <div style={{ fontSize: 11, color: '#8E8E93', marginTop: 1 }}>{sessions.length} total sessions · {counsellors.length} counsellors</div>
             </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             {msg.text && (
-              <div style={{ background: msg.type === 'error' ? '#FEF0F0' : '#ECFDF5', border: `1px solid ${msg.type === 'error' ? '#FADADD' : '#A7F3D0'}`, color: msg.type === 'error' ? '#C0392B' : '#166534', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 600 }}>
+              <div style={{ background: msg.type === 'error' ? '#FFF0F0' : '#F0FDF4', border: `1px solid ${msg.type === 'error' ? '#FF3B3030' : '#30D15830'}`, color: msg.type === 'error' ? '#FF3B30' : '#166534', borderRadius: 9, padding: '6px 12px', fontSize: 12, fontWeight: 600 }}>
                 {msg.type === 'error' ? '✗' : '✓'} {msg.text}
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-              <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#FEE8DC', color: '#E84A0C', display: 'grid', placeItems: 'center', fontWeight: 800, fontSize: 12 }}>
+              <div style={{ width: 34, height: 34, borderRadius: 17, background: '#FEE8DC', color: '#E84A0C', display: 'grid', placeItems: 'center', fontWeight: 700, fontSize: 13 }}>
                 {(user?.name || 'A')[0].toUpperCase()}
               </div>
               <div>
-                <div style={{ fontWeight: 600, fontSize: 12, color: '#111827' }}>{user?.name}</div>
-                <div style={{ fontSize: 10, color: '#9CA3AF' }}>Administrator</div>
+                <div style={{ fontWeight: 600, fontSize: 13, color: '#000000', letterSpacing: '-0.1px' }}>{user?.name}</div>
+                <div style={{ fontSize: 11, color: '#8E8E93' }}>Administrator</div>
               </div>
             </div>
           </div>
@@ -216,19 +211,19 @@ export default function AdminPage() {
 
           {/* KPI CARDS — Sessions tab only */}
           {tab === 'Sessions' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 22 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
               {[
-                { label: 'Total Sessions',  value: sessions.length,       icon: '◷', color: '#E84A0C', bg: '#FEE8DC' },
-                { label: 'Counsellors',     value: counsellors.length,    icon: '👤', color: '#2D8A4E', bg: '#D1FAE5' },
-                { label: 'Pending',         value: pending,               icon: '⏳', color: '#D97706', bg: '#FEF3C7' },
-                { label: 'Completed',       value: completed,             icon: '✓',  color: '#4338CA', bg: '#EEF2FF' },
+                { label: 'Total Sessions', value: sessions.length,    icon: '◷', color: '#E84A0C', bg: '#FEE8DC' },
+                { label: 'Counsellors',    value: counsellors.length, icon: '👤', color: '#30D158', bg: '#D1FAE5' },
+                { label: 'Pending',        value: pending,            icon: '⏳', color: '#FF9F0A', bg: '#FEF3C7' },
+                { label: 'Completed',      value: completed,          icon: '✓',  color: '#5E5CE6', bg: '#EEEEFF' },
               ].map(s => (
-                <div key={s.label} style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 13, padding: 18 }}>
+                <div key={s.label} style={{ background: 'white', borderRadius: 14, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                    <span style={{ color: '#6B7280', fontSize: 12, fontWeight: 500 }}>{s.label}</span>
-                    <div style={{ width: 34, height: 34, borderRadius: 9, background: s.bg, color: s.color, display: 'grid', placeItems: 'center', fontSize: 14 }}>{s.icon}</div>
+                    <span style={{ color: '#8E8E93', fontSize: 12, fontWeight: 500 }}>{s.label}</span>
+                    <div style={{ width: 32, height: 32, borderRadius: 9, background: s.bg, color: s.color, display: 'grid', placeItems: 'center', fontSize: 14 }}>{s.icon}</div>
                   </div>
-                  <div style={{ fontSize: 28, fontWeight: 800, color: '#111827', letterSpacing: '-0.8px' }}>{s.value}</div>
+                  <div style={{ fontSize: 30, fontWeight: 700, color: '#000000', letterSpacing: '-1px' }}>{s.value}</div>
                 </div>
               ))}
             </div>
@@ -236,11 +231,11 @@ export default function AdminPage() {
 
           {/* SESSIONS TABLE */}
           {tab === 'Sessions' && (
-            <div style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 13, overflow: 'hidden' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #E5E7EB' }}>
+            <div style={{ background: 'white', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: '0.5px solid rgba(60,60,67,0.18)' }}>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>All Sessions</div>
-                  <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>Latest counselling activity</div>
+                  <div style={{ fontWeight: 600, fontSize: 15, color: '#000000', letterSpacing: '-0.2px' }}>All Sessions</div>
+                  <div style={{ fontSize: 11, color: '#8E8E93', marginTop: 2 }}>Latest counselling activity</div>
                 </div>
               </div>
               <div style={{ overflowX: 'auto' }}>
@@ -248,34 +243,34 @@ export default function AdminPage() {
                   <thead>
                     <tr>
                       {['STUDENT / EMPLOYEE', 'CATEGORY', 'COUNSELLOR', 'DATE', 'STATUS', ''].map(h => (
-                        <th key={h} style={{ background: '#FAFAFA', color: '#6B7280', fontSize: 10, fontWeight: 600, textAlign: 'left', padding: '11px 18px', borderBottom: '1px solid #E5E7EB', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>{h}</th>
+                        <th key={h} style={{ background: '#F2F2F7', color: '#8E8E93', fontSize: 10, fontWeight: 600, textAlign: 'left', padding: '10px 18px', borderBottom: '0.5px solid rgba(60,60,67,0.12)', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {sessions.map(s => (
-                      <tr key={s.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
+                      <tr key={s.id} style={{ borderBottom: '0.5px solid rgba(60,60,67,0.1)' }}>
                         <td style={{ padding: '13px 18px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                            <div style={{ width: 30, height: 30, borderRadius: 8, background: '#FEE8DC', color: '#E84A0C', display: 'grid', placeItems: 'center', fontWeight: 800, fontSize: 10, flexShrink: 0 }}>
+                            <div style={{ width: 30, height: 30, borderRadius: 9, background: '#FEE8DC', color: '#E84A0C', display: 'grid', placeItems: 'center', fontWeight: 700, fontSize: 11, flexShrink: 0 }}>
                               {(s.requester_name || s.requester_id || '?')[0].toUpperCase()}
                             </div>
                             <div>
-                              <div style={{ fontWeight: 600, fontSize: 12, color: '#111827' }}>{s.requester_name || s.requester_id}</div>
-                              <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 2 }}>{s.requester_type}</div>
+                              <div style={{ fontWeight: 600, fontSize: 13, color: '#000000' }}>{s.requester_name || s.requester_id}</div>
+                              <div style={{ fontSize: 11, color: '#8E8E93', marginTop: 1 }}>{s.requester_type}</div>
                             </div>
                           </div>
                         </td>
-                        <td style={{ padding: '13px 18px', fontSize: 12, color: '#374151' }}>{s.categories?.name || '—'}</td>
-                        <td style={{ padding: '13px 18px', fontSize: 12, color: '#374151' }}>{s.counsellors?.name || <span style={{ color: '#D97706', fontStyle: 'italic' }}>Unassigned</span>}</td>
-                        <td style={{ padding: '13px 18px', fontSize: 11, color: '#9CA3AF', whiteSpace: 'nowrap' }}>
+                        <td style={{ padding: '13px 18px', fontSize: 13, color: '#3C3C43' }}>{s.categories?.name || '—'}</td>
+                        <td style={{ padding: '13px 18px', fontSize: 13, color: '#3C3C43' }}>{s.counsellors?.name || <span style={{ color: '#FF9F0A', fontStyle: 'italic' }}>Unassigned</span>}</td>
+                        <td style={{ padding: '13px 18px', fontSize: 12, color: '#8E8E93', whiteSpace: 'nowrap' }}>
                           {format(new Date(s.created_at), 'dd MMM yyyy')}
-                          {s.scheduled_at && <div style={{ color: '#374151', marginTop: 2 }}>📅 {format(new Date(s.scheduled_at), 'dd MMM')}</div>}
+                          {s.scheduled_at && <div style={{ color: '#3C3C43', marginTop: 2 }}>📅 {format(new Date(s.scheduled_at), 'dd MMM')}</div>}
                         </td>
                         <td style={{ padding: '13px 18px' }}><StatusBadge status={s.status} /></td>
                         <td style={{ padding: '13px 18px' }}>
                           <button onClick={() => { setReassignModal(s); setNewCounsellorId(s.counsellor_id || ''); }}
-                            style={{ fontSize: 11, color: '#E84A0C', background: '#FEF0E8', border: 'none', borderRadius: 7, padding: '5px 10px', cursor: 'pointer', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                            style={{ fontSize: 12, color: '#E84A0C', background: '#FFF5F0', border: 'none', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap', fontFamily: SF }}>
                             Reassign
                           </button>
                         </td>
@@ -290,8 +285,8 @@ export default function AdminPage() {
           {/* COUNSELLORS */}
           {tab === 'Counsellors' && (
             <div style={{ display: 'grid', gridTemplateColumns: '360px 1fr', gap: 20, alignItems: 'start' }}>
-              <div style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 13, padding: 22 }}>
-                <div style={{ fontWeight: 700, fontSize: 14, color: '#111827', marginBottom: 18 }}>Add Counsellor</div>
+              <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', borderRadius: 13, padding: 22 }}>
+                <div style={{ fontWeight: 700, fontSize: 15, color: '#000000', marginBottom: 18 }}>Add Counsellor</div>
                 <form onSubmit={addCounsellor} style={{ display: 'flex', flexDirection: 'column', gap: 13 }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                     <div><label className="label">Name</label><input type="text" className="input" style={{ marginTop: 6 }} value={newCounsellor.name} onChange={e => setNewCounsellor({ ...newCounsellor, name: e.target.value })} required /></div>
@@ -305,9 +300,9 @@ export default function AdminPage() {
                 </form>
               </div>
 
-              <div style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 13, overflow: 'hidden' }}>
-                <div style={{ padding: '16px 20px', borderBottom: '1px solid #E5E7EB' }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Counsellors ({counsellors.length})</div>
+              <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                <div style={{ padding: '16px 20px', borderBottom: '0.5px solid rgba(60,60,67,0.18)' }}>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: '#000000' }}>Counsellors ({counsellors.length})</div>
                 </div>
                 {counsellors.map((c, i) => (
                   <div key={c.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: i < counsellors.length - 1 ? '1px solid #F3F4F6' : 'none' }}>
@@ -316,11 +311,11 @@ export default function AdminPage() {
                         {(c.name || '?')[0].toUpperCase()}
                       </div>
                       <div>
-                        <div style={{ fontWeight: 600, fontSize: 13, color: '#111827' }}>{c.name}</div>
-                        <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>{c.email}{c.employee_id && ` · ${c.employee_id}`}{c.mobile && ` · ${c.mobile}`}</div>
+                        <div style={{ fontWeight: 600, fontSize: 13, color: '#000000' }}>{c.name}</div>
+                        <div style={{ fontSize: 11, color: '#8E8E93', marginTop: 2 }}>{c.email}{c.employee_id && ` · ${c.employee_id}`}{c.mobile && ` · ${c.mobile}`}</div>
                       </div>
                     </div>
-                    <button onClick={() => deleteCounsellor(c.id)} style={{ fontSize: 11, color: '#DC2626', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 7, padding: '5px 10px', cursor: 'pointer', fontWeight: 600 }}>Remove</button>
+                    <button onClick={() => deleteCounsellor(c.id)} style={{ fontSize: 11, color: '#FF3B30', background: '#FFF0F0', border: '1px solid #FECACA', borderRadius: 7, padding: '5px 10px', cursor: 'pointer', fontWeight: 600 }}>Remove</button>
                   </div>
                 ))}
               </div>
@@ -330,8 +325,8 @@ export default function AdminPage() {
           {/* CATEGORIES */}
           {tab === 'Categories' && (
             <div style={{ display: 'grid', gridTemplateColumns: '360px 1fr', gap: 20, alignItems: 'start' }}>
-              <div style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 13, padding: 22 }}>
-                <div style={{ fontWeight: 700, fontSize: 14, color: '#111827', marginBottom: 16 }}>Add Category</div>
+              <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', borderRadius: 13, padding: 22 }}>
+                <div style={{ fontWeight: 700, fontSize: 15, color: '#000000', marginBottom: 16 }}>Add Category</div>
                 <form onSubmit={addCategory} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   <div><label className="label">Category Name</label><input type="text" className="input" style={{ marginTop: 6 }} value={newCategory} onChange={e => setNewCategory(e.target.value)} placeholder="e.g. Academic Stress" required /></div>
                   <button type="submit" disabled={submitting} style={{ background: '#E84A0C', color: 'white', border: 'none', borderRadius: 9, height: 42, fontWeight: 600, fontSize: 13, cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.6 : 1 }}>
@@ -340,17 +335,17 @@ export default function AdminPage() {
                 </form>
               </div>
 
-              <div style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 13, overflow: 'hidden' }}>
-                <div style={{ padding: '16px 20px', borderBottom: '1px solid #E5E7EB' }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Categories ({categories.length})</div>
+              <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                <div style={{ padding: '16px 20px', borderBottom: '0.5px solid rgba(60,60,67,0.18)' }}>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: '#000000' }}>Categories ({categories.length})</div>
                 </div>
                 {categories.map((c, i) => (
                   <div key={c.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 20px', borderBottom: i < categories.length - 1 ? '1px solid #F3F4F6' : 'none' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#E84A0C', flexShrink: 0 }} />
-                      <span style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{c.name}</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: '#000000' }}>{c.name}</span>
                     </div>
-                    <button onClick={() => deleteCategory(c.id)} style={{ fontSize: 11, color: '#DC2626', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 7, padding: '5px 10px', cursor: 'pointer', fontWeight: 600 }}>Remove</button>
+                    <button onClick={() => deleteCategory(c.id)} style={{ fontSize: 11, color: '#FF3B30', background: '#FFF0F0', border: '1px solid #FECACA', borderRadius: 7, padding: '5px 10px', cursor: 'pointer', fontWeight: 600 }}>Remove</button>
                   </div>
                 ))}
               </div>
@@ -360,8 +355,8 @@ export default function AdminPage() {
           {/* MAPPING */}
           {tab === 'Mapping' && (
             <div style={{ display: 'grid', gridTemplateColumns: '360px 1fr', gap: 20, alignItems: 'start' }}>
-              <div style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 13, padding: 22 }}>
-                <div style={{ fontWeight: 700, fontSize: 14, color: '#111827', marginBottom: 16 }}>Map Category → Counsellor</div>
+              <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', borderRadius: 13, padding: 22 }}>
+                <div style={{ fontWeight: 700, fontSize: 15, color: '#000000', marginBottom: 16 }}>Map Category → Counsellor</div>
                 <form onSubmit={addMapping} style={{ display: 'flex', flexDirection: 'column', gap: 13 }}>
                   <div>
                     <label className="label">Category</label>
@@ -385,18 +380,18 @@ export default function AdminPage() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {categories.filter(c => c.category_counsellor_map?.length > 0).map(cat => (
-                  <div key={cat.id} style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 13, overflow: 'hidden' }}>
+                  <div key={cat.id} style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                     <div style={{ padding: '13px 18px', borderBottom: '1px solid #F3F4F6', display: 'flex', alignItems: 'center', gap: 8 }}>
                       <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#E84A0C' }} />
-                      <span style={{ fontWeight: 700, fontSize: 13, color: '#111827' }}>{cat.name}</span>
+                      <span style={{ fontWeight: 700, fontSize: 13, color: '#000000' }}>{cat.name}</span>
                     </div>
                     {cat.category_counsellor_map.map((m, i) => (
                       <div key={m.counsellor_id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 18px 11px 32px', borderBottom: i < cat.category_counsellor_map.length - 1 ? '1px solid #F3F4F6' : 'none' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, color: '#374151' }}>
-                          <span style={{ color: '#9CA3AF' }}>→</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, color: '#3C3C43' }}>
+                          <span style={{ color: '#8E8E93' }}>→</span>
                           <span style={{ fontWeight: 500 }}>{m.counsellors?.name}</span>
                         </div>
-                        <button onClick={() => removeMapping(cat.id, m.counsellor_id)} style={{ fontSize: 11, color: '#DC2626', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px', fontWeight: 600 }}>Remove</button>
+                        <button onClick={() => removeMapping(cat.id, m.counsellor_id)} style={{ fontSize: 11, color: '#FF3B30', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px', fontWeight: 600 }}>Remove</button>
                       </div>
                     ))}
                   </div>
@@ -408,8 +403,8 @@ export default function AdminPage() {
           {/* REPORTS */}
           {tab === 'Reports' && (
             <div style={{ display: 'grid', gridTemplateColumns: '360px 1fr', gap: 20, alignItems: 'start' }}>
-              <div style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 13, padding: 22 }}>
-                <div style={{ fontWeight: 700, fontSize: 14, color: '#111827', marginBottom: 18 }}>Generate Report</div>
+              <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', borderRadius: 13, padding: 22 }}>
+                <div style={{ fontWeight: 700, fontSize: 15, color: '#000000', marginBottom: 18 }}>Generate Report</div>
                 <form onSubmit={runReport} style={{ display: 'flex', flexDirection: 'column', gap: 13 }}>
                   <div>
                     <label className="label">Report Type</label>
@@ -448,24 +443,24 @@ export default function AdminPage() {
                       { label: 'Completed',      value: reportData.stats.byStatus.completed || 0, color: '#2D8A4E', bg: '#D1FAE5' },
                       { label: 'Avg Wellbeing',  value: reportData.stats.avgWellbeing || '—', color: '#D97706', bg: '#FEF3C7' },
                     ].map(s => (
-                      <div key={s.label} style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 12, padding: '16px 18px' }}>
+                      <div key={s.label} style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', borderRadius: 12, padding: '16px 18px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                          <span style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 500 }}>{s.label}</span>
+                          <span style={{ fontSize: 11, color: '#8E8E93', fontWeight: 500 }}>{s.label}</span>
                           <div style={{ width: 28, height: 28, borderRadius: 7, background: s.bg }} />
                         </div>
                         <div style={{ fontSize: 26, fontWeight: 800, color: s.color }}>{s.value}</div>
                       </div>
                     ))}
                   </div>
-                  <div style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 13, overflow: 'hidden' }}>
-                    <div style={{ padding: '14px 18px', borderBottom: '1px solid #E5E7EB' }}>
-                      <div style={{ fontWeight: 700, fontSize: 13, color: '#111827' }}>Sessions ({reportData.sessions.length})</div>
+                  <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                    <div style={{ padding: '14px 18px', borderBottom: '0.5px solid rgba(60,60,67,0.18)' }}>
+                      <div style={{ fontWeight: 700, fontSize: 13, color: '#000000' }}>Sessions ({reportData.sessions.length})</div>
                     </div>
                     {reportData.sessions.map((s, i) => (
                       <div key={s.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 18px', borderBottom: i < reportData.sessions.length - 1 ? '1px solid #F3F4F6' : 'none' }}>
                         <div>
-                          <div style={{ fontWeight: 600, fontSize: 13, color: '#111827' }}>{s.requester_name || s.requester_id}</div>
-                          <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>{s.categories?.name} · {s.counsellors?.name} · {format(new Date(s.created_at), 'dd MMM yyyy')}</div>
+                          <div style={{ fontWeight: 600, fontSize: 13, color: '#000000' }}>{s.requester_name || s.requester_id}</div>
+                          <div style={{ fontSize: 11, color: '#8E8E93', marginTop: 2 }}>{s.categories?.name} · {s.counsellors?.name} · {format(new Date(s.created_at), 'dd MMM yyyy')}</div>
                           {s.remarks && <div style={{ marginTop: 4 }}><WellbeingStars value={s.remarks.counsellor_wellbeing_score} readOnly /></div>}
                         </div>
                         <StatusBadge status={s.status} />
@@ -485,7 +480,7 @@ export default function AdminPage() {
         <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) setReassignModal(null); }}>
           <div className="modal">
             <div style={{ fontWeight: 800, fontSize: 17, color: '#1A1A1A', marginBottom: 4 }}>Reassign Counsellor</div>
-            <div style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 20 }}>{reassignModal.requester_name} · {reassignModal.categories?.name}</div>
+            <div style={{ fontSize: 13, color: '#8E8E93', marginBottom: 20 }}>{reassignModal.requester_name} · {reassignModal.categories?.name}</div>
             <form onSubmit={reassign} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <select className="input" value={newCounsellorId} onChange={e => setNewCounsellorId(e.target.value)} required>
                 <option value="">Select counsellor...</option>
