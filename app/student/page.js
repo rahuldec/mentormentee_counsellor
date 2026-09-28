@@ -21,7 +21,10 @@ export default function StudentPage() {
     const uid = sessionStorage.getItem('user_id');
     const role = sessionStorage.getItem('role');
     if (!uid) { router.push('/'); return; }
-    const u = { id: uid, name: sessionStorage.getItem('name') || uid, email: sessionStorage.getItem('email') || '', role };
+    const storedName = sessionStorage.getItem('name');
+    // Clean up name — don't show unresolved ERP placeholders
+    const displayName = (storedName && !storedName.includes('{')) ? storedName : uid;
+    const u = { id: uid, name: displayName, email: sessionStorage.getItem('email') || '', role };
     setUser(u);
     loadData(uid);
   }, [router]);

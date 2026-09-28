@@ -24,8 +24,10 @@ export default function Home() {
       if (e) sessionStorage.setItem('email', e);
       router.push('/student');
     } else if (mobile) {
-      const empId = params.get('empId') || params.get('emp id') || params.get('emp_id');
-      sessionStorage.setItem('user_id', empId || mobile); // prefer empId, fallback to mobile
+      const empId = params.get('empId') || params.get('emp_id');
+      // Only use empId if it's a real value (not an unresolved ERP placeholder)
+      const resolvedId = (empId && !empId.includes('{')) ? empId : mobile;
+      sessionStorage.setItem('user_id', resolvedId);
       sessionStorage.setItem('role', 'employee');
       if (n) sessionStorage.setItem('name', n);
       if (e) sessionStorage.setItem('email', e);
