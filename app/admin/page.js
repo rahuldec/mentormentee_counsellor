@@ -252,7 +252,7 @@ export default function AdminPage() {
                     </div>
                     <div>
                       <div style={{ fontWeight: 600, fontSize: 14, color: '#1E2A3B' }}>{c.name}</div>
-                      <div style={{ fontSize: 12, color: '#94A3B8' }}>{c.email}{c.employee_id && ` · ${c.employee_id}`}</div>
+                      <div style={{ fontSize: 12, color: '#94A3B8' }}>{c.email}{c.employee_id && ` · ${c.employee_id}`}{c.mobile && ` · 📱 ${c.mobile}`}</div>
                     </div>
                   </div>
                   <button onClick={() => deleteCounsellor(c.id)} style={{ fontSize: 12, color: '#E11D48', background: '#FFF1F2', border: '1px solid #FFE4E6', borderRadius: 8, padding: '5px 10px', cursor: 'pointer' }}>Remove</button>
