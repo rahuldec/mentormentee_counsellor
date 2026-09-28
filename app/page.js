@@ -55,14 +55,14 @@ export default function Home() {
           <p className="text-sm text-gray-500 mt-1">Dev mode — enter your details</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-3">
           <div>
-            <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Employee/Student ID</label>
+            <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">ID / Reg No / Mobile</label>
             <input
               type="text"
               value={userId}
               onChange={e => setUserId(e.target.value)}
-              placeholder="e.g. EMP001 or STU123"
+              placeholder="e.g. STU001 or 9876543210"
               required
               className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -88,25 +88,21 @@ export default function Home() {
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Role</label>
-            <select
-              value={role}
-              onChange={e => setRole(e.target.value)}
-              className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="student">Student</option>
-              <option value="employee">Employee</option>
-              <option value="counsellor">Counsellor</option>
-              <option value="teacher">Teacher</option>
-              <option value="admin">Admin</option>
-            </select>
+            <label className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2 block">Enter as</label>
+            <div className="grid grid-cols-5 gap-1.5">
+              {['student','employee','counsellor','teacher','admin'].map(r => (
+                <button
+                  key={r}
+                  type="submit"
+                  onClick={() => setRole(r)}
+                  className={`py-2 rounded-lg text-xs font-medium border transition-colors capitalize
+                    ${role === r ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-200 hover:border-blue-400 hover:text-blue-600'}`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
           </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white font-semibold py-2.5 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Enter Portal
-          </button>
         </form>
       </div>
     </div>
