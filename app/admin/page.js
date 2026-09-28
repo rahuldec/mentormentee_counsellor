@@ -5,30 +5,32 @@ import StatusBadge from '@/components/StatusBadge';
 import WellbeingStars from '@/components/WellbeingStars';
 import { format } from 'date-fns';
 
-const TABS = ['Sessions', 'Reports', 'Counsellors', 'Categories', 'Mapping'];
+const TABS = [
+  { key: 'Sessions',   icon: '📋' },
+  { key: 'Reports',    icon: '📊' },
+  { key: 'Counsellors',icon: '👤' },
+  { key: 'Categories', icon: '🏷️' },
+  { key: 'Mapping',    icon: '🔗' },
+];
 
 export default function AdminPage() {
   const router = useRouter();
-  const [user, setUser] = useState(null);
-  const [tab, setTab] = useState('Sessions');
-  const [sessions, setSessions] = useState([]);
+  const [user, setUser]           = useState(null);
+  const [tab, setTab]             = useState('Sessions');
+  const [sessions, setSessions]   = useState([]);
   const [counsellors, setCounsellors] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading]     = useState(true);
 
-  // Forms
   const [newCounsellor, setNewCounsellor] = useState({ name: '', email: '', mobile: '', employee_id: '' });
-  const [newCategory, setNewCategory] = useState('');
-  const [mapForm, setMapForm] = useState({ category_id: '', counsellor_id: '' });
-  const [submitting, setSubmitting] = useState(false);
-  const [msg, setMsg] = useState('');
+  const [newCategory, setNewCategory]     = useState('');
+  const [mapForm, setMapForm]             = useState({ category_id: '', counsellor_id: '' });
+  const [submitting, setSubmitting]       = useState(false);
+  const [msg, setMsg]                     = useState({ text: '', type: 'success' });
 
-  // Report filters
-  const [reportType, setReportType] = useState('student');
-  const [reportId, setReportId] = useState('');
-  const [reportData, setReportData] = useState(null);
-
-  // Reassign
+  const [reportType, setReportType]   = useState('student');
+  const [reportId, setReportId]       = useState('');
+  const [reportData, setReportData]   = useState(null);
   const [reassignModal, setReassignModal] = useState(null);
   const [newCounsellorId, setNewCounsellorId] = useState('');
 
@@ -41,24 +43,18 @@ export default function AdminPage() {
 
   async function loadAll() {
     setLoading(true);
-    const [sRes, cRes, catRes] = await Promise.all([
-      fetch('/api/sessions'),
-      fetch('/api/counsellors'),
-      fetch('/api/categories'),
-    ]);
-    setSessions(await sRes.json());
-    setCounsellors(await cRes.json());
-    setCategories(await catRes.json());
+    const [sRes, cRes, catRes] = await Promise.all([fetch('/api/sessions'), fetch('/api/counsellors'), fetch('/api/categories')]);
+    setSessions(await sRes.json()); setCounsellors(await cRes.json()); setCategories(await catRes.json());
     setLoading(false);
   }
 
+  function flash(text, type = 'success') { setMsg({ text, type }); setTimeout(() => setMsg({ text: '', type: 'success' }), 3000); }
+
   async function addCounsellor(e) {
-    e.preventDefault();
-    setSubmitting(true);
+    e.preventDefault(); setSubmitting(true);
     const res = await fetch('/api/counsellors', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newCounsellor) });
-    if (res.ok) { setMsg('Counsellor added!'); setNewCounsellor({ name: '', email: '', mobile: '', employee_id: '' }); loadAll(); }
+    if (res.ok) { flash('Counsellor added!'); setNewCounsellor({ name: '', email: '', mobile: '', employee_id: '' }); loadAll(); }
     setSubmitting(false);
-    setTimeout(() => setMsg(''), 3000);
   }
 
   async function deleteCounsellor(id) {
@@ -68,12 +64,10 @@ export default function AdminPage() {
   }
 
   async function addCategory(e) {
-    e.preventDefault();
-    setSubmitting(true);
+    e.preventDefault(); setSubmitting(true);
     const res = await fetch('/api/categories', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: newCategory }) });
-    if (res.ok) { setMsg('Category added!'); setNewCategory(''); loadAll(); }
+    if (res.ok) { flash('Category added!'); setNewCategory(''); loadAll(); }
     setSubmitting(false);
-    setTimeout(() => setMsg(''), 3000);
   }
 
   async function deleteCategory(id) {
@@ -83,13 +77,11 @@ export default function AdminPage() {
   }
 
   async function addMapping(e) {
-    e.preventDefault();
-    setSubmitting(true);
+    e.preventDefault(); setSubmitting(true);
     const res = await fetch('/api/mapping', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(mapForm) });
-    if (res.ok) { setMsg('Mapping added!'); setMapForm({ category_id: '', counsellor_id: '' }); loadAll(); }
-    else { const d = await res.json(); setMsg(d.error || 'Error'); }
+    if (res.ok) { flash('Mapping added!'); setMapForm({ category_id: '', counsellor_id: '' }); loadAll(); }
+    else { const d = await res.json(); flash(d.error || 'Error', 'error'); }
     setSubmitting(false);
-    setTimeout(() => setMsg(''), 3000);
   }
 
   async function removeMapping(category_id, counsellor_id) {
@@ -106,59 +98,79 @@ export default function AdminPage() {
   async function reassign(e) {
     e.preventDefault();
     await fetch(`/api/sessions/${reassignModal.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'reassign', counsellor_id: newCounsellorId }) });
-    setReassignModal(null);
-    loadAll();
+    setReassignModal(null); loadAll();
   }
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>;
+  if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}><div className="spinner" /></div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-8">
-      <div className="bg-white border-b sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <h1 className="font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-xs text-gray-500">{user?.name}</p>
-        </div>
-        <div className="max-w-2xl mx-auto px-4 flex gap-1 overflow-x-auto pb-0">
-          {TABS.map(t => (
-            <button key={t} onClick={() => setTab(t)} className={`px-3 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${tab === t ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}>{t}</button>
-          ))}
+    <div style={{ minHeight: '100vh', background: '#F0F4FF', paddingBottom: 32 }}>
+      {/* Header */}
+      <div className="page-header">
+        <div style={{ maxWidth: 680, margin: '0 auto', padding: '14px 16px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, #7C3AED, #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>⚙️</div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 15, color: '#1E2A3B' }}>Admin Dashboard</div>
+              <div style={{ fontSize: 12, color: '#94A3B8' }}>{user?.name} · {sessions.length} sessions total</div>
+            </div>
+          </div>
+          {/* Tabs */}
+          <div style={{ display: 'flex', gap: 0, overflowX: 'auto', paddingBottom: 0 }}>
+            {TABS.map(t => (
+              <button key={t.key} onClick={() => setTab(t.key)} style={{
+                padding: '8px 14px', fontSize: 13, fontWeight: tab === t.key ? 600 : 400,
+                color: tab === t.key ? '#4F46E5' : '#64748B',
+                borderBottom: tab === t.key ? '2.5px solid #4F46E5' : '2.5px solid transparent',
+                background: 'none', border: 'none', borderBottom: tab === t.key ? '2.5px solid #4F46E5' : '2.5px solid transparent',
+                cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.15s',
+              }}>
+                {t.icon} {t.key}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 pt-4">
-        {msg && <div className="bg-blue-50 border border-blue-200 text-blue-700 text-sm px-4 py-3 rounded-lg mb-4">{msg}</div>}
+      <div style={{ maxWidth: 680, margin: '0 auto', padding: '16px 16px 0' }}>
+        {msg.text && (
+          <div style={{ background: msg.type === 'error' ? '#FFF1F2' : '#ECFDF5', border: `1px solid ${msg.type === 'error' ? '#FFE4E6' : '#A7F3D0'}`, color: msg.type === 'error' ? '#E11D48' : '#065F46', borderRadius: 12, padding: '11px 16px', fontSize: 13, fontWeight: 500, marginBottom: 12 }}>
+            {msg.type === 'error' ? '✗' : '✓'} {msg.text}
+          </div>
+        )}
 
-        {/* SESSIONS TAB */}
+        {/* SESSIONS */}
         {tab === 'Sessions' && (
-          <div className="space-y-3">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {sessions.map(s => (
-              <div key={s.id} className="bg-white rounded-xl border p-4">
-                <div className="flex items-start justify-between mb-1">
-                  <div>
-                    <p className="font-medium text-sm">{s.requester_name || s.requester_id} <span className="text-gray-400 font-normal">({s.requester_type})</span></p>
-                    <p className="text-xs text-gray-400">{s.categories?.name} · {format(new Date(s.created_at), 'dd MMM yyyy')}</p>
-                    {s.counsellors && <p className="text-xs text-gray-500">Counsellor: {s.counsellors.name}</p>}
+              <div key={s.id} className={`session-card ${s.status}`}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, fontSize: 14, color: '#1E2A3B' }}>{s.requester_name || s.requester_id} <span style={{ fontWeight: 400, fontSize: 12, color: '#94A3B8' }}>({s.requester_type})</span></div>
+                    <div style={{ fontSize: 12, color: '#64748B' }}>{s.categories?.name} · {format(new Date(s.created_at), 'dd MMM yyyy')}</div>
+                    {s.counsellors && <div style={{ fontSize: 12, color: '#4F46E5', marginTop: 2 }}>Counsellor: {s.counsellors.name}</div>}
+                    {s.scheduled_at && <div style={{ fontSize: 12, color: '#64748B', marginTop: 2 }}>📅 {format(new Date(s.scheduled_at), 'dd MMM yyyy, hh:mm a')}</div>}
+                    {s.remarks && <div style={{ marginTop: 4 }}><WellbeingStars value={s.remarks.counsellor_wellbeing_score} readOnly /></div>}
                   </div>
-                  <StatusBadge status={s.status} />
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                    <StatusBadge status={s.status} />
+                    <button onClick={() => { setReassignModal(s); setNewCounsellorId(s.counsellor_id || ''); }} style={{ fontSize: 11, color: '#4F46E5', background: '#EEF2FF', border: 'none', borderRadius: 7, padding: '4px 10px', cursor: 'pointer', fontWeight: 500 }}>Reassign</button>
+                  </div>
                 </div>
-                {s.scheduled_at && <p className="text-xs text-gray-500">📅 {format(new Date(s.scheduled_at), 'dd MMM yyyy, hh:mm a')}{s.location && ` · 📍 ${s.location}`}</p>}
-                {s.remarks && <div className="mt-1 flex items-center gap-2"><span className="text-xs text-gray-500">Wellbeing:</span><WellbeingStars value={s.remarks.counsellor_wellbeing_score} readOnly /></div>}
-                <button onClick={() => { setReassignModal(s); setNewCounsellorId(s.counsellor_id || ''); }} className="mt-2 text-xs text-blue-600 border border-blue-200 px-3 py-1 rounded-lg hover:bg-blue-50">Reassign Counsellor</button>
               </div>
             ))}
           </div>
         )}
 
-        {/* REPORTS TAB */}
+        {/* REPORTS */}
         {tab === 'Reports' && (
           <div>
-            <div className="bg-white rounded-xl border p-4 mb-4">
-              <h2 className="font-semibold text-gray-900 mb-3">Generate Report</h2>
-              <form onSubmit={runReport} className="space-y-3">
+            <div className="card" style={{ padding: 20, marginBottom: 16 }}>
+              <div style={{ fontWeight: 700, fontSize: 15, color: '#1E2A3B', marginBottom: 16 }}>Generate Report</div>
+              <form onSubmit={runReport} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div>
-                  <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Report Type</label>
-                  <select value={reportType} onChange={e => setReportType(e.target.value)} className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <label className="label">Report Type</label>
+                  <select className="input" style={{ marginTop: 6 }} value={reportType} onChange={e => { setReportType(e.target.value); setReportId(''); setReportData(null); }}>
                     <option value="student">Student-wise</option>
                     <option value="employee">Employee-wise</option>
                     <option value="counsellor">Counsellor-wise</option>
@@ -166,52 +178,48 @@ export default function AdminPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">
-                    {reportType === 'counsellor' ? 'Counsellor' : reportType === 'category' ? 'Category' : 'ID (leave blank for all)'}
-                  </label>
+                  <label className="label">{reportType === 'counsellor' ? 'Counsellor' : reportType === 'category' ? 'Category' : 'ID (leave blank for all)'}</label>
                   {reportType === 'counsellor' ? (
-                    <select value={reportId} onChange={e => setReportId(e.target.value)} className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select className="input" style={{ marginTop: 6 }} value={reportId} onChange={e => setReportId(e.target.value)}>
                       <option value="">All counsellors</option>
                       {counsellors.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   ) : reportType === 'category' ? (
-                    <select value={reportId} onChange={e => setReportId(e.target.value)} className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select className="input" style={{ marginTop: 6 }} value={reportId} onChange={e => setReportId(e.target.value)}>
                       <option value="">All categories</option>
                       {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   ) : (
-                    <input type="text" value={reportId} onChange={e => setReportId(e.target.value)} placeholder="Student/Employee ID" className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input type="text" className="input" style={{ marginTop: 6 }} value={reportId} onChange={e => setReportId(e.target.value)} placeholder="Student/Employee ID (or leave blank for all)" />
                   )}
                 </div>
-                <button type="submit" className="w-full bg-blue-600 text-white font-medium py-2 rounded-lg hover:bg-blue-700 text-sm">Run Report</button>
+                <button type="submit" className="btn-primary" style={{ width: '100%' }}>Run Report</button>
               </form>
             </div>
 
             {reportData && (
               <div>
-                <div className="grid grid-cols-3 gap-3 mb-4">
-                  <div className="bg-white rounded-xl border p-3 text-center">
-                    <p className="text-2xl font-bold text-blue-600">{reportData.stats.total}</p>
-                    <p className="text-xs text-gray-500">Total Sessions</p>
-                  </div>
-                  <div className="bg-white rounded-xl border p-3 text-center">
-                    <p className="text-2xl font-bold text-green-600">{reportData.stats.byStatus.completed || 0}</p>
-                    <p className="text-xs text-gray-500">Completed</p>
-                  </div>
-                  <div className="bg-white rounded-xl border p-3 text-center">
-                    <p className="text-2xl font-bold text-yellow-500">{reportData.stats.avgWellbeing || '-'}</p>
-                    <p className="text-xs text-gray-500">Avg Wellbeing</p>
-                  </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 16 }}>
+                  {[
+                    { label: 'Total Sessions', value: reportData.stats.total, color: '#4F46E5' },
+                    { label: 'Completed', value: reportData.stats.byStatus.completed || 0, color: '#059669' },
+                    { label: 'Avg Wellbeing', value: reportData.stats.avgWellbeing || '—', color: '#F59E0B' },
+                  ].map(stat => (
+                    <div key={stat.label} className="card" style={{ padding: '14px 10px', textAlign: 'center' }}>
+                      <div style={{ fontSize: 24, fontWeight: 800, color: stat.color }}>{stat.value}</div>
+                      <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 3 }}>{stat.label}</div>
+                    </div>
+                  ))}
                 </div>
-                <div className="space-y-2">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {reportData.sessions.map(s => (
-                    <div key={s.id} className="bg-white rounded-xl border p-3">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">{s.requester_name || s.requester_id}</p>
+                    <div key={s.id} className="card" style={{ padding: '12px 14px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                        <div style={{ fontWeight: 600, fontSize: 13, color: '#1E2A3B' }}>{s.requester_name || s.requester_id}</div>
                         <StatusBadge status={s.status} />
                       </div>
-                      <p className="text-xs text-gray-400">{s.categories?.name} · {s.counsellors?.name} · {format(new Date(s.created_at), 'dd MMM yyyy')}</p>
-                      {s.remarks && <WellbeingStars value={s.remarks.counsellor_wellbeing_score} readOnly />}
+                      <div style={{ fontSize: 12, color: '#94A3B8' }}>{s.categories?.name} · {s.counsellors?.name} · {format(new Date(s.created_at), 'dd MMM yyyy')}</div>
+                      {s.remarks && <div style={{ marginTop: 4 }}><WellbeingStars value={s.remarks.counsellor_wellbeing_score} readOnly /></div>}
                     </div>
                   ))}
                 </div>
@@ -220,99 +228,102 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* COUNSELLORS TAB */}
+        {/* COUNSELLORS */}
         {tab === 'Counsellors' && (
           <div>
-            <div className="bg-white rounded-xl border p-4 mb-4">
-              <h2 className="font-semibold text-gray-900 mb-3">Add Counsellor</h2>
-              <form onSubmit={addCounsellor} className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Name</label>
-                    <input type="text" value={newCounsellor.name} onChange={e => setNewCounsellor({ ...newCounsellor, name: e.target.value })} required className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Employee ID</label>
-                    <input type="text" value={newCounsellor.employee_id} onChange={e => setNewCounsellor({ ...newCounsellor, employee_id: e.target.value })} className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                  </div>
+            <div className="card" style={{ padding: 20, marginBottom: 14 }}>
+              <div style={{ fontWeight: 700, fontSize: 15, color: '#1E2A3B', marginBottom: 16 }}>Add Counsellor</div>
+              <form onSubmit={addCounsellor} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div><label className="label">Name</label><input type="text" className="input" style={{ marginTop: 6 }} value={newCounsellor.name} onChange={e => setNewCounsellor({ ...newCounsellor, name: e.target.value })} required /></div>
+                  <div><label className="label">Employee ID</label><input type="text" className="input" style={{ marginTop: 6 }} value={newCounsellor.employee_id} onChange={e => setNewCounsellor({ ...newCounsellor, employee_id: e.target.value })} /></div>
                 </div>
-                <div>
-                  <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Email</label>
-                  <input type="email" value={newCounsellor.email} onChange={e => setNewCounsellor({ ...newCounsellor, email: e.target.value })} required className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Mobile</label>
-                  <input type="text" value={newCounsellor.mobile} onChange={e => setNewCounsellor({ ...newCounsellor, mobile: e.target.value })} className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                </div>
-                <button type="submit" disabled={submitting} className="w-full bg-blue-600 text-white font-medium py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm">{submitting ? 'Adding...' : 'Add Counsellor'}</button>
+                <div><label className="label">Email</label><input type="email" className="input" style={{ marginTop: 6 }} value={newCounsellor.email} onChange={e => setNewCounsellor({ ...newCounsellor, email: e.target.value })} required /></div>
+                <div><label className="label">Mobile</label><input type="text" className="input" style={{ marginTop: 6 }} value={newCounsellor.mobile} onChange={e => setNewCounsellor({ ...newCounsellor, mobile: e.target.value })} /></div>
+                <button type="submit" disabled={submitting} className="btn-primary" style={{ width: '100%' }}>{submitting ? 'Adding...' : 'Add Counsellor'}</button>
               </form>
             </div>
-            <div className="space-y-2">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {counsellors.map(c => (
-                <div key={c.id} className="bg-white rounded-xl border p-3 flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-sm">{c.name}</p>
-                    <p className="text-xs text-gray-400">{c.email} {c.employee_id && `· ${c.employee_id}`}</p>
+                <div key={c.id} className="card" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: '#EEF2FF', color: '#4F46E5', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {(c.name || '?')[0].toUpperCase()}
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: 14, color: '#1E2A3B' }}>{c.name}</div>
+                      <div style={{ fontSize: 12, color: '#94A3B8' }}>{c.email}{c.employee_id && ` · ${c.employee_id}`}</div>
+                    </div>
                   </div>
-                  <button onClick={() => deleteCounsellor(c.id)} className="text-xs text-red-500 hover:text-red-700">Remove</button>
+                  <button onClick={() => deleteCounsellor(c.id)} style={{ fontSize: 12, color: '#E11D48', background: '#FFF1F2', border: '1px solid #FFE4E6', borderRadius: 8, padding: '5px 10px', cursor: 'pointer' }}>Remove</button>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* CATEGORIES TAB */}
+        {/* CATEGORIES */}
         {tab === 'Categories' && (
           <div>
-            <div className="bg-white rounded-xl border p-4 mb-4">
-              <h2 className="font-semibold text-gray-900 mb-3">Add Category</h2>
-              <form onSubmit={addCategory} className="flex gap-2">
-                <input type="text" value={newCategory} onChange={e => setNewCategory(e.target.value)} placeholder="Category name" required className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                <button type="submit" disabled={submitting} className="bg-blue-600 text-white font-medium px-4 py-2 rounded-lg hover:bg-blue-700 text-sm disabled:opacity-50">Add</button>
+            <div className="card" style={{ padding: 20, marginBottom: 14 }}>
+              <div style={{ fontWeight: 700, fontSize: 15, color: '#1E2A3B', marginBottom: 14 }}>Add Category</div>
+              <form onSubmit={addCategory} style={{ display: 'flex', gap: 8 }}>
+                <input type="text" className="input" value={newCategory} onChange={e => setNewCategory(e.target.value)} placeholder="Category name" required />
+                <button type="submit" disabled={submitting} className="btn-primary" style={{ whiteSpace: 'nowrap' }}>Add</button>
               </form>
             </div>
-            <div className="space-y-2">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {categories.map(c => (
-                <div key={c.id} className="bg-white rounded-xl border p-3 flex items-center justify-between">
-                  <p className="text-sm font-medium">{c.name}</p>
-                  <button onClick={() => deleteCategory(c.id)} className="text-xs text-red-500 hover:text-red-700">Remove</button>
+                <div key={c.id} className="card" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#4F46E5' }} />
+                    <span style={{ fontSize: 14, fontWeight: 500, color: '#1E2A3B' }}>{c.name}</span>
+                  </div>
+                  <button onClick={() => deleteCategory(c.id)} style={{ fontSize: 12, color: '#E11D48', background: '#FFF1F2', border: '1px solid #FFE4E6', borderRadius: 8, padding: '5px 10px', cursor: 'pointer' }}>Remove</button>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* MAPPING TAB */}
+        {/* MAPPING */}
         {tab === 'Mapping' && (
           <div>
-            <div className="bg-white rounded-xl border p-4 mb-4">
-              <h2 className="font-semibold text-gray-900 mb-3">Map Category → Counsellor</h2>
-              <form onSubmit={addMapping} className="space-y-3">
+            <div className="card" style={{ padding: 20, marginBottom: 14 }}>
+              <div style={{ fontWeight: 700, fontSize: 15, color: '#1E2A3B', marginBottom: 16 }}>Map Category → Counsellor</div>
+              <form onSubmit={addMapping} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div>
-                  <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Category</label>
-                  <select value={mapForm.category_id} onChange={e => setMapForm({ ...mapForm, category_id: e.target.value })} required className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <label className="label">Category</label>
+                  <select className="input" style={{ marginTop: 6 }} value={mapForm.category_id} onChange={e => setMapForm({ ...mapForm, category_id: e.target.value })} required>
                     <option value="">Select category...</option>
                     {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Counsellor</label>
-                  <select value={mapForm.counsellor_id} onChange={e => setMapForm({ ...mapForm, counsellor_id: e.target.value })} required className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <label className="label">Counsellor</label>
+                  <select className="input" style={{ marginTop: 6 }} value={mapForm.counsellor_id} onChange={e => setMapForm({ ...mapForm, counsellor_id: e.target.value })} required>
                     <option value="">Select counsellor...</option>
                     {counsellors.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
                 </div>
-                <button type="submit" disabled={submitting} className="w-full bg-blue-600 text-white font-medium py-2 rounded-lg hover:bg-blue-700 text-sm disabled:opacity-50">{submitting ? 'Adding...' : 'Add Mapping'}</button>
+                <button type="submit" disabled={submitting} className="btn-primary" style={{ width: '100%' }}>{submitting ? 'Adding...' : 'Add Mapping'}</button>
               </form>
             </div>
-            <div className="space-y-2">
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {categories.filter(c => c.category_counsellor_map?.length > 0).map(cat => (
-                <div key={cat.id} className="bg-white rounded-xl border p-3">
-                  <p className="text-sm font-semibold text-gray-900 mb-2">{cat.name}</p>
+                <div key={cat.id} className="card" style={{ padding: '14px 16px' }}>
+                  <div style={{ fontWeight: 600, fontSize: 13, color: '#1E2A3B', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4F46E5', display: 'inline-block' }} />
+                    {cat.name}
+                  </div>
                   {cat.category_counsellor_map.map(m => (
-                    <div key={m.counsellor_id} className="flex items-center justify-between py-1">
-                      <p className="text-xs text-gray-600">→ {m.counsellors?.name}</p>
-                      <button onClick={() => removeMapping(cat.id, m.counsellor_id)} className="text-xs text-red-500 hover:text-red-700">Remove</button>
+                    <div key={m.counsellor_id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 14, paddingTop: 6, paddingBottom: 6, borderTop: '1px solid #F1F5F9' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#475569' }}>
+                        <span style={{ color: '#94A3B8' }}>→</span>
+                        <span style={{ fontWeight: 500 }}>{m.counsellors?.name}</span>
+                      </div>
+                      <button onClick={() => removeMapping(cat.id, m.counsellor_id)} style={{ fontSize: 11, color: '#E11D48', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px' }}>Remove</button>
                     </div>
                   ))}
                 </div>
@@ -324,18 +335,18 @@ export default function AdminPage() {
 
       {/* Reassign Modal */}
       {reassignModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md p-5">
-            <h3 className="font-semibold text-gray-900 mb-1">Reassign Counsellor</h3>
-            <p className="text-xs text-gray-500 mb-4">Session: {reassignModal.requester_name} · {reassignModal.categories?.name}</p>
-            <form onSubmit={reassign} className="space-y-3">
-              <select value={newCounsellorId} onChange={e => setNewCounsellorId(e.target.value)} required className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) setReassignModal(null); }}>
+          <div className="modal">
+            <div style={{ fontWeight: 700, fontSize: 17, color: '#1E2A3B', marginBottom: 4 }}>Reassign Counsellor</div>
+            <div style={{ fontSize: 13, color: '#94A3B8', marginBottom: 20 }}>{reassignModal.requester_name} · {reassignModal.categories?.name}</div>
+            <form onSubmit={reassign} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <select className="input" value={newCounsellorId} onChange={e => setNewCounsellorId(e.target.value)} required>
                 <option value="">Select counsellor...</option>
                 {counsellors.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
-              <div className="flex gap-2">
-                <button type="submit" className="flex-1 bg-blue-600 text-white font-medium py-2 rounded-lg hover:bg-blue-700 text-sm">Reassign</button>
-                <button type="button" onClick={() => setReassignModal(null)} className="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button type="submit" className="btn-primary" style={{ flex: 1 }}>Reassign</button>
+                <button type="button" className="btn-ghost" onClick={() => setReassignModal(null)}>Cancel</button>
               </div>
             </form>
           </div>

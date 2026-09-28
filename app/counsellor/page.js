@@ -7,15 +7,26 @@ import { format } from 'date-fns';
 
 const TABS = ['Pending', 'Upcoming', 'Completed', 'All'];
 
+function Avatar({ name, size = 36 }) {
+  const initials = (name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  const colors = ['#4F46E5', '#0891B2', '#059669', '#D97706', '#7C3AED', '#DB2777'];
+  const color = colors[(name || '').charCodeAt(0) % colors.length];
+  return (
+    <div style={{ width: size, height: size, borderRadius: 10, background: `${color}20`, color, fontSize: size * 0.38, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      {initials}
+    </div>
+  );
+}
+
 export default function CounsellorPage() {
   const router = useRouter();
-  const [user, setUser] = useState(null);
-  const [sessions, setSessions] = useState([]);
+  const [user, setUser]           = useState(null);
+  const [sessions, setSessions]   = useState([]);
   const [counsellorId, setCounsellorId] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState('Pending');
-  const [actionModal, setActionModal] = useState(null); // { session, type: 'accept'|'decline'|'remarks' }
-  const [form, setForm] = useState({});
+  const [loading, setLoading]     = useState(true);
+  const [tab, setTab]             = useState('Pending');
+  const [actionModal, setActionModal] = useState(null);
+  const [form, setForm]           = useState({});
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -23,7 +34,6 @@ export default function CounsellorPage() {
     if (!uid) { router.push('/'); return; }
     const u = { id: uid, name: sessionStorage.getItem('name') || uid, email: sessionStorage.getItem('email') || '' };
     setUser(u);
-    // Find counsellor record by employee_id or email
     loadCounsellor(uid, u.email);
   }, [router]);
 
@@ -31,91 +41,51 @@ export default function CounsellorPage() {
     const res = await fetch('/api/counsellors');
     const counsellors = await res.json();
     const c = counsellors.find(x => x.employee_id === uid || x.email === email);
-    if (c) {
-      setCounsellorId(c.id);
-      loadSessions(c.id);
-    } else {
-      setLoading(false);
-    }
+    if (c) { setCounsellorId(c.id); loadSessions(c.id); }
+    else setLoading(false);
   }
 
   async function loadSessions(cid) {
     setLoading(true);
-    // Load sessions assigned to this counsellor + unassigned sessions in their mapped categories
     const [assignedRes, categoriesRes] = await Promise.all([
       fetch(`/api/sessions?counsellor_id=${cid}`),
-      fetch(`/api/categories`),
+      fetch('/api/categories'),
     ]);
     const assigned = await assignedRes.json();
     const categories = await categoriesRes.json();
-
-    // Find categories mapped to this counsellor
-    const myCategoryIds = categories
-      .filter(cat => cat.category_counsellor_map?.some(m => m.counsellor_id === cid))
-      .map(cat => cat.id);
-
-    // Fetch unassigned sessions in those categories
+    const myCategoryIds = categories.filter(cat => cat.category_counsellor_map?.some(m => m.counsellor_id === cid)).map(cat => cat.id);
     let unassigned = [];
     if (myCategoryIds.length > 0) {
-      const unassignedRes = await fetch(`/api/sessions?unassigned=true&category_ids=${myCategoryIds.join(',')}`);
-      unassigned = await unassignedRes.json();
+      const ur = await fetch(`/api/sessions?unassigned=true&category_ids=${myCategoryIds.join(',')}`);
+      unassigned = await ur.json();
     }
-
-    // Merge, deduplicate by id
     const merged = [...assigned];
-    unassigned.forEach(s => {
-      if (!merged.find(m => m.id === s.id)) merged.push(s);
-    });
+    unassigned.forEach(s => { if (!merged.find(m => m.id === s.id)) merged.push(s); });
     setSessions(merged);
     setLoading(false);
   }
 
   async function handleAction(e) {
-    e.preventDefault();
-    setSubmitting(true);
+    e.preventDefault(); setSubmitting(true);
     const { session, type } = actionModal;
     let body = { action: type };
-
-    if (type === 'accept' || type === 'reschedule') {
-      body.scheduled_at = form.scheduled_at;
-      body.location = form.location;
-    } else if (type === 'decline') {
-      body.decline_reason = form.decline_reason;
-    }
-
-    await fetch(`/api/sessions/${session.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-
-    setActionModal(null);
-    setForm({});
-    setSubmitting(false);
-    loadSessions(counsellorId);
+    if (type === 'accept' || type === 'reschedule') { body.scheduled_at = form.scheduled_at; body.location = form.location; }
+    else if (type === 'decline') { body.decline_reason = form.decline_reason; }
+    await fetch(`/api/sessions/${session.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    setActionModal(null); setForm({}); setSubmitting(false); loadSessions(counsellorId);
   }
 
   async function saveRemarks(e) {
-    e.preventDefault();
-    setSubmitting(true);
+    e.preventDefault(); setSubmitting(true);
     const { session } = actionModal;
     await fetch('/api/remarks', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        session_id: session.id,
-        counsellor_notes: form.counsellor_notes,
-        student_notes: form.student_notes,
-        counsellor_wellbeing_score: form.counsellor_wellbeing_score,
-        student_wellbeing_score: form.student_wellbeing_score,
-      }),
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: session.id, counsellor_notes: form.counsellor_notes, student_notes: form.student_notes, counsellor_wellbeing_score: form.counsellor_wellbeing_score, student_wellbeing_score: form.student_wellbeing_score }),
     });
-    setActionModal(null);
-    setForm({});
-    setSubmitting(false);
-    loadSessions(counsellorId);
+    setActionModal(null); setForm({}); setSubmitting(false); loadSessions(counsellorId);
   }
 
+  const pendingCount = sessions.filter(s => s.status === 'pending' || s.status === 'reopened').length;
   const filtered = sessions.filter(s => {
     if (tab === 'Pending') return s.status === 'pending' || s.status === 'reopened';
     if (tab === 'Upcoming') return s.status === 'accepted' || s.status === 'rescheduled';
@@ -123,104 +93,114 @@ export default function CounsellorPage() {
     return true;
   });
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>;
+  if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}><div className="spinner" /></div>;
 
   if (!counsellorId) return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="text-center">
-        <p className="text-gray-600 mb-2">Counsellor profile not found.</p>
-        <p className="text-sm text-gray-400">Ask admin to add your employee ID: <strong>{user?.id}</strong></p>
+    <div style={{ minHeight: '100vh', background: '#F0F4FF', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div className="card" style={{ padding: 32, textAlign: 'center', maxWidth: 340 }}>
+        <div style={{ fontSize: 48, marginBottom: 12 }}>🔍</div>
+        <div style={{ fontWeight: 700, fontSize: 16, color: '#1E2A3B', marginBottom: 8 }}>Profile Not Found</div>
+        <div style={{ fontSize: 13, color: '#94A3B8', lineHeight: 1.6 }}>Ask admin to add your employee ID: <strong style={{ color: '#4F46E5' }}>{user?.id}</strong></div>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-8">
+    <div style={{ minHeight: '100vh', background: '#F0F4FF', paddingBottom: 32 }}>
       {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-10">
-        <div className="max-w-lg mx-auto px-4 py-4">
-          <h1 className="font-bold text-gray-900">Counsellor Dashboard</h1>
-          <p className="text-xs text-gray-500">{user?.name}</p>
+      <div className="page-header">
+        <div style={{ maxWidth: 560, margin: '0 auto', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, #059669, #10B981)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <svg width="20" height="20" fill="white" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 15, color: '#1E2A3B' }}>Counsellor Dashboard</div>
+            <div style={{ fontSize: 12, color: '#94A3B8' }}>{user?.name}</div>
+          </div>
+          {pendingCount > 0 && (
+            <div style={{ marginLeft: 'auto', background: '#EF4444', color: 'white', fontSize: 12, fontWeight: 700, borderRadius: 20, padding: '3px 10px', minWidth: 28, textAlign: 'center' }}>
+              {pendingCount}
+            </div>
+          )}
         </div>
         {/* Tabs */}
-        <div className="max-w-lg mx-auto px-4 flex gap-1 pb-0">
-          {TABS.map(t => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`px-3 py-2 text-sm font-medium border-b-2 transition-colors ${tab === t ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
-            >
-              {t}
-              {t === 'Pending' && sessions.filter(s => s.status === 'pending' || s.status === 'reopened').length > 0 && (
-                <span className="ml-1.5 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
-                  {sessions.filter(s => s.status === 'pending' || s.status === 'reopened').length}
-                </span>
-              )}
-            </button>
-          ))}
+        <div style={{ maxWidth: 560, margin: '0 auto', padding: '0 16px 12px' }}>
+          <div className="pill-tabs">
+            {TABS.map(t => (
+              <button key={t} onClick={() => setTab(t)} className={`pill-tab ${tab === t ? 'active' : ''}`}>
+                {t}
+                {t === 'Pending' && pendingCount > 0 && (
+                  <span style={{ marginLeft: 5, background: '#EF4444', color: 'white', fontSize: 10, fontWeight: 700, borderRadius: 10, padding: '1px 5px' }}>{pendingCount}</span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="max-w-lg mx-auto px-4 pt-4">
+      <div style={{ maxWidth: 560, margin: '0 auto', padding: '16px 16px 0' }}>
         {filtered.length === 0 ? (
-          <div className="text-center py-16 text-gray-400">
-            <div className="text-4xl mb-2">✓</div>
-            <p>No sessions in this category</p>
+          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>✓</div>
+            <div style={{ fontWeight: 600, fontSize: 15, color: '#64748B' }}>No sessions here</div>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {filtered.map(s => (
-              <div key={s.id} className="bg-white rounded-xl border p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <p className="font-medium text-sm text-gray-900">{s.requester_name || s.requester_id}</p>
-                    <p className="text-xs text-gray-400">{s.requester_type} · {s.categories?.name}</p>
-                    <p className="text-xs text-gray-400">{format(new Date(s.created_at), 'dd MMM yyyy')}</p>
+              <div key={s.id} className={`session-card ${s.status}`}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
+                  <Avatar name={s.requester_name || s.requester_id} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, fontSize: 14, color: '#1E2A3B', marginBottom: 2 }}>{s.requester_name || s.requester_id}</div>
+                    <div style={{ fontSize: 11, color: '#94A3B8', textTransform: 'capitalize' }}>{s.requester_type} · {s.categories?.name}</div>
+                    <div style={{ fontSize: 11, color: '#CBD5E1' }}>{format(new Date(s.created_at), 'dd MMM yyyy')}</div>
                   </div>
                   <StatusBadge status={s.status} />
                 </div>
 
                 {s.requester_notes && (
-                  <p className="text-xs text-gray-500 bg-gray-50 rounded p-2 mb-2 italic">"{s.requester_notes}"</p>
+                  <div style={{ fontSize: 12, color: '#64748B', fontStyle: 'italic', borderLeft: '3px solid #E2E8F0', paddingLeft: 8, marginBottom: 8 }}>
+                    "{s.requester_notes}"
+                  </div>
                 )}
 
                 {s.scheduled_at && (
-                  <p className="text-xs text-gray-600 mb-2">
+                  <div style={{ background: '#EEF2FF', borderRadius: 8, padding: '7px 10px', fontSize: 12, color: '#4338CA', marginBottom: 8 }}>
                     📅 {format(new Date(s.scheduled_at), 'dd MMM yyyy, hh:mm a')}
                     {s.location && <span> · 📍 {s.location}</span>}
-                  </p>
+                  </div>
                 )}
 
                 {s.referred_by_name && (
-                  <p className="text-xs text-purple-600 mb-2">Referred by: {s.referred_by_name}</p>
+                  <div style={{ fontSize: 12, color: '#7C3AED', marginBottom: 8 }}>↗ Referred by {s.referred_by_name}</div>
                 )}
 
                 {s.remarks && (
-                  <div className="bg-green-50 rounded p-2 mb-2">
-                    <p className="text-xs text-green-700 font-medium mb-1">Remarks saved</p>
+                  <div style={{ background: '#F0FDF4', borderRadius: 8, padding: '8px 10px', marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: '#166534', marginBottom: 4 }}>Remarks saved</div>
                     <WellbeingStars value={s.remarks.counsellor_wellbeing_score} readOnly />
                   </div>
                 )}
 
                 {/* Actions */}
-                <div className="flex flex-wrap gap-2 mt-3">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
                   {(s.status === 'pending' || s.status === 'reopened') && (
                     <>
-                      <button onClick={() => { setActionModal({ session: s, type: 'accept' }); setForm({}); }} className="text-xs bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700">Accept</button>
-                      <button onClick={() => { setActionModal({ session: s, type: 'decline' }); setForm({}); }} className="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded-lg hover:bg-red-200">Decline</button>
+                      <button onClick={() => { setActionModal({ session: s, type: 'accept' }); setForm({}); }} className="btn-success">Accept</button>
+                      <button onClick={() => { setActionModal({ session: s, type: 'decline' }); setForm({}); }} className="btn-danger">Decline</button>
                     </>
                   )}
                   {(s.status === 'accepted' || s.status === 'rescheduled') && (
                     <>
-                      <button onClick={() => { setActionModal({ session: s, type: 'reschedule' }); setForm({ scheduled_at: s.scheduled_at?.slice(0, 16), location: s.location }); }} className="text-xs border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50">Reschedule</button>
-                      <button onClick={() => { setActionModal({ session: s, type: 'remarks' }); setForm(s.remarks || {}); }} className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700">Add Remarks</button>
+                      <button onClick={() => { setActionModal({ session: s, type: 'reschedule' }); setForm({ scheduled_at: s.scheduled_at?.slice(0, 16), location: s.location }); }} className="btn-ghost">Reschedule</button>
+                      <button onClick={() => { setActionModal({ session: s, type: 'remarks' }); setForm(s.remarks || {}); }} className="btn-primary" style={{ padding: '8px 16px', fontSize: 13 }}>Add Remarks</button>
                     </>
                   )}
                   {s.status === 'completed' && !s.remarks && (
-                    <button onClick={() => { setActionModal({ session: s, type: 'remarks' }); setForm({}); }} className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700">Add Remarks</button>
+                    <button onClick={() => { setActionModal({ session: s, type: 'remarks' }); setForm({}); }} className="btn-primary" style={{ padding: '8px 16px', fontSize: 13 }}>Add Remarks</button>
                   )}
                   {s.remarks && (
-                    <button onClick={() => { setActionModal({ session: s, type: 'remarks' }); setForm(s.remarks); }} className="text-xs border border-blue-200 text-blue-600 px-3 py-1.5 rounded-lg hover:bg-blue-50">Edit Remarks</button>
+                    <button onClick={() => { setActionModal({ session: s, type: 'remarks' }); setForm(s.remarks); }} className="btn-ghost">Edit Remarks</button>
                   )}
                 </div>
               </div>
@@ -229,65 +209,55 @@ export default function CounsellorPage() {
         )}
       </div>
 
-      {/* Modal */}
+      {/* Modals */}
       {actionModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md p-5">
-            {actionModal.type === 'accept' || actionModal.type === 'reschedule' ? (
+        <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) { setActionModal(null); } }}>
+          <div className="modal">
+            {(actionModal.type === 'accept' || actionModal.type === 'reschedule') && (
               <>
-                <h3 className="font-semibold text-gray-900 mb-4">{actionModal.type === 'accept' ? 'Accept Session' : 'Reschedule Session'}</h3>
-                <form onSubmit={handleAction} className="space-y-3">
-                  <div>
-                    <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Date & Time</label>
-                    <input type="datetime-local" value={form.scheduled_at || ''} onChange={e => setForm({ ...form, scheduled_at: e.target.value })} required className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Location</label>
-                    <input type="text" value={form.location || ''} onChange={e => setForm({ ...form, location: e.target.value })} placeholder="e.g. Room 204, Block A" className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                  </div>
-                  <div className="flex gap-2 pt-1">
-                    <button type="submit" disabled={submitting} className="flex-1 bg-green-600 text-white font-medium py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm">{submitting ? 'Saving...' : 'Confirm'}</button>
-                    <button type="button" onClick={() => setActionModal(null)} className="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
+                <div style={{ fontWeight: 700, fontSize: 17, color: '#1E2A3B', marginBottom: 4 }}>{actionModal.type === 'accept' ? 'Accept Session' : 'Reschedule Session'}</div>
+                <div style={{ fontSize: 13, color: '#94A3B8', marginBottom: 20 }}>For {actionModal.session.requester_name}</div>
+                <form onSubmit={handleAction} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  <div><label className="label">Date & Time</label><input type="datetime-local" className="input" style={{ marginTop: 6 }} value={form.scheduled_at || ''} onChange={e => setForm({ ...form, scheduled_at: e.target.value })} required /></div>
+                  <div><label className="label">Location</label><input type="text" className="input" style={{ marginTop: 6 }} value={form.location || ''} onChange={e => setForm({ ...form, location: e.target.value })} placeholder="e.g. Room 204, Block A" /></div>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                    <button type="submit" disabled={submitting} className="btn-success" style={{ flex: 1, padding: '11px 0', fontSize: 14 }}>{submitting ? 'Saving...' : 'Confirm'}</button>
+                    <button type="button" className="btn-ghost" onClick={() => setActionModal(null)}>Cancel</button>
                   </div>
                 </form>
               </>
-            ) : actionModal.type === 'decline' ? (
+            )}
+            {actionModal.type === 'decline' && (
               <>
-                <h3 className="font-semibold text-gray-900 mb-4">Decline Session</h3>
-                <form onSubmit={handleAction} className="space-y-3">
-                  <div>
-                    <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Reason (optional)</label>
-                    <textarea value={form.decline_reason || ''} onChange={e => setForm({ ...form, decline_reason: e.target.value })} rows={3} placeholder="Reason for declining..." className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
-                  </div>
-                  <div className="flex gap-2">
-                    <button type="submit" disabled={submitting} className="flex-1 bg-red-600 text-white font-medium py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 text-sm">{submitting ? 'Saving...' : 'Decline'}</button>
-                    <button type="button" onClick={() => setActionModal(null)} className="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
+                <div style={{ fontWeight: 700, fontSize: 17, color: '#1E2A3B', marginBottom: 4 }}>Decline Session</div>
+                <div style={{ fontSize: 13, color: '#94A3B8', marginBottom: 20 }}>From {actionModal.session.requester_name}</div>
+                <form onSubmit={handleAction} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  <div><label className="label">Reason (optional)</label><textarea className="input" style={{ marginTop: 6 }} value={form.decline_reason || ''} onChange={e => setForm({ ...form, decline_reason: e.target.value })} rows={3} placeholder="Reason for declining..." /></div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button type="submit" disabled={submitting} className="btn-danger" style={{ flex: 1, padding: '11px 0', fontSize: 14, background: '#EF4444', color: 'white', borderColor: '#EF4444' }}>{submitting ? 'Saving...' : 'Decline'}</button>
+                    <button type="button" className="btn-ghost" onClick={() => setActionModal(null)}>Cancel</button>
                   </div>
                 </form>
               </>
-            ) : (
+            )}
+            {actionModal.type === 'remarks' && (
               <>
-                <h3 className="font-semibold text-gray-900 mb-4">Session Remarks</h3>
-                <form onSubmit={saveRemarks} className="space-y-4">
+                <div style={{ fontWeight: 700, fontSize: 17, color: '#1E2A3B', marginBottom: 4 }}>Session Remarks</div>
+                <div style={{ fontSize: 13, color: '#94A3B8', marginBottom: 20 }}>For {actionModal.session.requester_name}</div>
+                <form onSubmit={saveRemarks} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  <div><label className="label">Counsellor Notes</label><textarea className="input" style={{ marginTop: 6 }} value={form.counsellor_notes || ''} onChange={e => setForm({ ...form, counsellor_notes: e.target.value })} rows={3} placeholder="Session observations and notes..." /></div>
+                  <div><label className="label">Student's Notes / Shared</label><textarea className="input" style={{ marginTop: 6 }} value={form.student_notes || ''} onChange={e => setForm({ ...form, student_notes: e.target.value })} rows={2} placeholder="What the student shared..." /></div>
                   <div>
-                    <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Counsellor Notes</label>
-                    <textarea value={form.counsellor_notes || ''} onChange={e => setForm({ ...form, counsellor_notes: e.target.value })} rows={3} placeholder="Session observations and notes..." className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Student's Notes / Shared</label>
-                    <textarea value={form.student_notes || ''} onChange={e => setForm({ ...form, student_notes: e.target.value })} rows={2} placeholder="What the student shared in session..." className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2 block">Counsellor Wellbeing Score</label>
+                    <label className="label" style={{ marginBottom: 8 }}>Counsellor Wellbeing Score</label>
                     <WellbeingStars value={form.counsellor_wellbeing_score} onChange={v => setForm({ ...form, counsellor_wellbeing_score: v })} />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2 block">Student Self-Reported Score</label>
+                    <label className="label" style={{ marginBottom: 8 }}>Student Self-Reported Score</label>
                     <WellbeingStars value={form.student_wellbeing_score} onChange={v => setForm({ ...form, student_wellbeing_score: v })} />
                   </div>
-                  <div className="flex gap-2">
-                    <button type="submit" disabled={submitting} className="flex-1 bg-blue-600 text-white font-medium py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm">{submitting ? 'Saving...' : 'Save Remarks'}</button>
-                    <button type="button" onClick={() => setActionModal(null)} className="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                    <button type="submit" disabled={submitting} className="btn-primary" style={{ flex: 1, padding: '11px 0', fontSize: 14 }}>{submitting ? 'Saving...' : 'Save Remarks'}</button>
+                    <button type="button" className="btn-ghost" onClick={() => setActionModal(null)}>Cancel</button>
                   </div>
                 </form>
               </>
