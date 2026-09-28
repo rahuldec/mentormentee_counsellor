@@ -28,6 +28,7 @@ export default function Home() {
     const e      = clean(params.get('email'));
 
     if (regNo) {
+      sessionStorage.clear();
       sessionStorage.setItem('user_id', regNo);
       sessionStorage.setItem('role', 'student');
       if (n) sessionStorage.setItem('name', n);
@@ -36,6 +37,7 @@ export default function Home() {
     } else if (mobile) {
       const empId = clean(params.get('empId') || params.get('emp_id'));
       const resolvedId = empId || mobile;
+      sessionStorage.clear();
       sessionStorage.setItem('user_id', resolvedId);
       sessionStorage.setItem('role', 'employee');
       if (n) sessionStorage.setItem('name', n);
