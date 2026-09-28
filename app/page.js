@@ -12,16 +12,23 @@ export default function Home() {
   useEffect(() => {
     // Read params from URL (ERP integration)
     const params = new URLSearchParams(window.location.search);
-    const uid = params.get('user_id');
-    const r = params.get('role');
+    const regNo = params.get('regNo');   // student
+    const mobile = params.get('mobile'); // employee
     const n = params.get('name');
     const e = params.get('email');
-    if (uid && r) {
-      sessionStorage.setItem('user_id', uid);
-      sessionStorage.setItem('role', r);
+
+    if (regNo) {
+      sessionStorage.setItem('user_id', regNo);
+      sessionStorage.setItem('role', 'student');
       if (n) sessionStorage.setItem('name', n);
       if (e) sessionStorage.setItem('email', e);
-      router.push(`/${r}`);
+      router.push('/student');
+    } else if (mobile) {
+      sessionStorage.setItem('user_id', mobile);
+      sessionStorage.setItem('role', 'employee');
+      if (n) sessionStorage.setItem('name', n);
+      if (e) sessionStorage.setItem('email', e);
+      router.push('/employee');
     }
   }, [router]);
 
