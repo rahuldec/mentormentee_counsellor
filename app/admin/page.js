@@ -101,18 +101,18 @@ export default function AdminPage() {
     setReassignModal(null); loadAll();
   }
 
-  if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#FEF6EE' }}><div className="spinner" /></div>;
+  if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#F5F5F5' }}><div className="spinner" /></div>;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#FEF6EE', paddingBottom: 32 }}>
+    <div style={{ minHeight: '100vh', background: '#F5F5F5', paddingBottom: 32 }}>
       {/* Header */}
-      <div style={{ background: '#1A1A1A' }}>
+      <div style={{ background: 'white', borderBottom: '1px solid #F0E6DA' }}>
         <div style={{ maxWidth: 680, margin: '0 auto', padding: '16px 16px 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
             <div style={{ width: 42, height: 42, borderRadius: 13, background: 'linear-gradient(135deg, #E84A0C, #F97316)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>⚙️</div>
             <div>
-              <div style={{ fontWeight: 800, fontSize: 15, color: 'white', letterSpacing: '-0.2px' }}>Admin Dashboard</div>
-              <div style={{ fontSize: 12, color: '#F97316', fontWeight: 600 }}>{user?.name} · {sessions.length} sessions total</div>
+              <div style={{ fontWeight: 800, fontSize: 15, color: '#1A1A1A', letterSpacing: '-0.2px' }}>Admin Dashboard</div>
+              <div style={{ fontSize: 12, color: '#E84A0C', fontWeight: 600 }}>{user?.name} · {sessions.length} sessions total</div>
             </div>
           </div>
           {/* Tabs */}
@@ -120,7 +120,7 @@ export default function AdminPage() {
             {TABS.map(t => (
               <button key={t.key} onClick={() => setTab(t.key)} style={{
                 padding: '9px 14px', fontSize: 13, fontWeight: tab === t.key ? 700 : 500,
-                color: tab === t.key ? '#E84A0C' : 'rgba(255,255,255,0.5)',
+                color: tab === t.key ? '#E84A0C' : '#8C7B6B',
                 borderBottom: tab === t.key ? '2.5px solid #E84A0C' : '2.5px solid transparent',
                 background: 'none', border: 'none',
                 cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.15s',
@@ -130,7 +130,6 @@ export default function AdminPage() {
             ))}
           </div>
         </div>
-        <div style={{ height: 4, background: 'linear-gradient(90deg, #E84A0C, #F97316, #FBBF24)' }} />
       </div>
 
       <div style={{ maxWidth: 680, margin: '0 auto', padding: '16px 16px 0' }}>

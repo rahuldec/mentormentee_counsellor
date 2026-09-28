@@ -94,13 +94,13 @@ export default function CounsellorPage() {
   });
 
   if (loading) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#FEF6EE' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#F5F5F5' }}>
       <div className="spinner" />
     </div>
   );
 
   if (!counsellorId) return (
-    <div style={{ minHeight: '100vh', background: '#FEF6EE', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+    <div style={{ minHeight: '100vh', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
       <div className="card" style={{ padding: 32, textAlign: 'center', maxWidth: 340, border: '1.5px solid #F0E6DA' }}>
         <div style={{ fontSize: 48, marginBottom: 12 }}>🔍</div>
         <div style={{ fontWeight: 800, fontSize: 16, color: '#1A1A1A', marginBottom: 8 }}>Profile Not Found</div>
@@ -110,16 +110,16 @@ export default function CounsellorPage() {
   );
 
   return (
-    <div style={{ minHeight: '100vh', background: '#FEF6EE', paddingBottom: 32 }}>
+    <div style={{ minHeight: '100vh', background: '#F5F5F5', paddingBottom: 32 }}>
       {/* Header */}
-      <div style={{ background: '#1A1A1A' }}>
-        <div style={{ maxWidth: 580, margin: '0 auto', padding: '16px 16px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ background: 'white', borderBottom: '1px solid #EBEBEB' }}>
+        <div style={{ maxWidth: 580, margin: '0 auto', padding: '14px 16px 0', display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ width: 42, height: 42, borderRadius: 13, background: 'linear-gradient(135deg, #E84A0C, #F97316)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <svg width="20" height="20" fill="white" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 800, fontSize: 15, color: 'white', letterSpacing: '-0.2px' }}>Counsellor Dashboard</div>
-            <div style={{ fontSize: 12, color: '#F97316', fontWeight: 600, marginTop: 1 }}>{user?.name}</div>
+            <div style={{ fontWeight: 800, fontSize: 15, color: '#1A1A1A', letterSpacing: '-0.2px' }}>Counsellor Dashboard</div>
+            <div style={{ fontSize: 12, color: '#E84A0C', fontWeight: 600, marginTop: 1 }}>{user?.name}</div>
           </div>
           {pendingCount > 0 && (
             <div style={{ background: '#E84A0C', color: 'white', fontSize: 12, fontWeight: 800, borderRadius: 20, padding: '3px 10px', minWidth: 28, textAlign: 'center' }}>
@@ -129,30 +129,25 @@ export default function CounsellorPage() {
         </div>
 
         {/* Tabs */}
-        <div style={{ maxWidth: 580, margin: '0 auto', padding: '0 16px 14px' }}>
-          <div className="pill-tabs" style={{ background: 'rgba(255,255,255,0.1)' }}>
-            {TABS.map(t => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                style={{
-                  flex: 1, padding: '8px 10px', borderRadius: 9, fontSize: 13, fontWeight: 600,
-                  color: tab === t ? '#E84A0C' : 'rgba(255,255,255,0.55)',
-                  background: tab === t ? 'white' : 'transparent',
-                  border: 'none', cursor: 'pointer', transition: 'all 0.2s', textAlign: 'center', whiteSpace: 'nowrap',
-                  boxShadow: tab === t ? '0 1px 4px rgba(0,0,0,0.15)' : 'none',
-                }}
-              >
-                {t}
-                {t === 'Pending' && pendingCount > 0 && (
-                  <span style={{ marginLeft: 5, background: '#E84A0C', color: 'white', fontSize: 10, fontWeight: 800, borderRadius: 10, padding: '1px 5px' }}>{pendingCount}</span>
-                )}
-              </button>
-            ))}
-          </div>
+        <div style={{ maxWidth: 580, margin: '0 auto', padding: '10px 16px 0', display: 'flex', gap: 0 }}>
+          {TABS.map(t => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              style={{
+                padding: '8px 14px', fontSize: 13, fontWeight: tab === t ? 700 : 500,
+                color: tab === t ? '#E84A0C' : '#8C7B6B',
+                borderBottom: tab === t ? '2.5px solid #E84A0C' : '2.5px solid transparent',
+                background: 'none', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.15s',
+              }}
+            >
+              {t}
+              {t === 'Pending' && pendingCount > 0 && (
+                <span style={{ marginLeft: 5, background: '#E84A0C', color: 'white', fontSize: 10, fontWeight: 800, borderRadius: 10, padding: '1px 5px' }}>{pendingCount}</span>
+              )}
+            </button>
+          ))}
         </div>
-
-        <div style={{ height: 4, background: 'linear-gradient(90deg, #E84A0C, #F97316, #FBBF24)' }} />
       </div>
 
       <div style={{ maxWidth: 580, margin: '0 auto', padding: '16px 16px 0' }}>

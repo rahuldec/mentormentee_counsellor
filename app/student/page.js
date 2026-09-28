@@ -70,7 +70,7 @@ export default function StudentPage() {
   }
 
   if (loading) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#FEF6EE' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#F5F5F5' }}>
       <div className="spinner" />
     </div>
   );
@@ -79,16 +79,16 @@ export default function StudentPage() {
   const pending   = sessions.filter(s => s.status === 'pending' || s.status === 'reopened').length;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#FEF6EE', paddingBottom: 40 }}>
+    <div style={{ minHeight: '100vh', background: '#F5F5F5', paddingBottom: 40 }}>
       {/* Header */}
-      <div style={{ background: '#1A1A1A', paddingBottom: 0 }}>
+      <div style={{ background: 'white', borderBottom: '1px solid #F0E6DA' }}>
         <div style={{ maxWidth: 540, margin: '0 auto', padding: '16px 16px 20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <Avatar name={user?.name} size={44} />
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: 'white', letterSpacing: '-0.2px' }}>{user?.name}</div>
-                <div style={{ fontSize: 12, color: '#F97316', fontWeight: 600, textTransform: 'capitalize', marginTop: 1 }}>{user?.role}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: '#1A1A1A', letterSpacing: '-0.2px' }}>{user?.name}</div>
+                <div style={{ fontSize: 12, color: '#E84A0C', fontWeight: 600, textTransform: 'capitalize', marginTop: 1 }}>{user?.role}</div>
               </div>
             </div>
             <button
@@ -103,21 +103,18 @@ export default function StudentPage() {
           {sessions.length > 0 && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, marginTop: 16 }}>
               {[
-                { label: 'Total', value: sessions.length, color: '#F97316' },
+                { label: 'Total', value: sessions.length, color: '#E84A0C' },
                 { label: 'Completed', value: completed, color: '#2D8A4E' },
                 { label: 'Pending', value: pending, color: '#F59E0B' },
               ].map(s => (
-                <div key={s.label} style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 12, padding: '10px 12px', textAlign: 'center' }}>
+                <div key={s.label} style={{ background: '#F5F5F5', borderRadius: 12, padding: '10px 12px', textAlign: 'center', border: '1px solid #F0E6DA' }}>
                   <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</div>
-                  <div style={{ fontSize: 11, color: '#9A8A7A', marginTop: 2, fontWeight: 600 }}>{s.label}</div>
+                  <div style={{ fontSize: 11, color: '#8C7B6B', marginTop: 2, fontWeight: 600 }}>{s.label}</div>
                 </div>
               ))}
             </div>
           )}
         </div>
-
-        {/* Orange accent strip */}
-        <div style={{ height: 4, background: 'linear-gradient(90deg, #E84A0C, #F97316, #FBBF24)' }} />
       </div>
 
       <div style={{ maxWidth: 540, margin: '0 auto', padding: '20px 16px 0' }}>
@@ -237,7 +234,7 @@ export default function StudentPage() {
             <div style={{ fontSize: 13, color: '#B8A99A', marginBottom: 12 }}>{reopenModal.categories?.name}</div>
 
             {reopenModal.scheduled_at && (
-              <div style={{ background: '#FEF6EE', borderRadius: 10, padding: '10px 12px', marginBottom: 16, fontSize: 12, color: '#7A6550', border: '1px solid #EDE0D4' }}>
+              <div style={{ background: '#F5F5F5', borderRadius: 10, padding: '10px 12px', marginBottom: 16, fontSize: 12, color: '#7A6550', border: '1px solid #EDE0D4' }}>
                 <div style={{ fontWeight: 700, marginBottom: 4, fontSize: 11, color: '#B8A99A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Previous session</div>
                 <div>📅 {format(new Date(reopenModal.scheduled_at), 'dd MMM yyyy, hh:mm a')}</div>
                 {reopenModal.location && <div>📍 {reopenModal.location}</div>}
