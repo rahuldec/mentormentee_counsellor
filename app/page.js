@@ -24,7 +24,8 @@ export default function Home() {
       if (e) sessionStorage.setItem('email', e);
       router.push('/student');
     } else if (mobile) {
-      sessionStorage.setItem('user_id', mobile);
+      const empId = params.get('empId');
+      sessionStorage.setItem('user_id', empId || mobile); // prefer empId, fallback to mobile
       sessionStorage.setItem('role', 'employee');
       if (n) sessionStorage.setItem('name', n);
       if (e) sessionStorage.setItem('email', e);
