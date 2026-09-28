@@ -36,6 +36,8 @@ export default function AdminPage() {
   const [reassignModal, setReassignModal] = useState(null);
   const [newCounsellorId, setNewCounsellorId] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [emailConfigs, setEmailConfigs] = useState([]);
+  const [editingEmail, setEditingEmail] = useState(null);
 
   useEffect(() => {
     const uid = sessionStorage.getItem('user_id');
@@ -46,9 +48,18 @@ export default function AdminPage() {
 
   async function loadAll() {
     setLoading(true);
-    const [sRes, cRes, catRes] = await Promise.all([fetch('/api/sessions'), fetch('/api/counsellors'), fetch('/api/categories')]);
+    const [sRes, cRes, catRes, eRes] = await Promise.all([fetch('/api/sessions'), fetch('/api/counsellors'), fetch('/api/categories'), fetch('/api/email-config')]);
     setSessions(await sRes.json()); setCounsellors(await cRes.json()); setCategories(await catRes.json());
+    const eData = await eRes.json(); if (Array.isArray(eData)) setEmailConfigs(eData);
     setLoading(false);
+  }
+
+  async function saveEmailConfig(e) {
+    e.preventDefault(); setSubmitting(true);
+    const res = await fetch('/api/email-config', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editingEmail) });
+    if (res.ok) { flash('Email config saved!'); loadAll(); setEditingEmail(null); }
+    else { const d = await res.json(); flash(d.error || 'Error saving', 'error'); }
+    setSubmitting(false);
   }
 
   function flash(text, type = 'success') { setMsg({ text, type }); setTimeout(() => setMsg({ text: '', type: 'success' }), 3000); }
@@ -158,7 +169,7 @@ export default function AdminPage() {
             </button>
           ))}
           <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '12px 12px 6px' }}>Administration</div>
-          {[{ key: 'Counsellors', icon: '👤', label: 'Counsellors' }, { key: 'Categories', icon: '🏷️', label: 'Categories' }, { key: 'Mapping', icon: '⇄', label: 'Mapping' }].map(n => (
+          {[{ key: 'Counsellors', icon: '👤', label: 'Counsellors' }, { key: 'Categories', icon: '🏷️', label: 'Categories' }, { key: 'Mapping', icon: '⇄', label: 'Mapping' }, { key: 'Email', icon: '✉', label: 'Email Config' }].map(n => (
             <button key={n.key} onClick={() => { setTab(n.key); setSidebarOpen(false); }} style={{
               height: 40, display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px',
               borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: 13.5, fontWeight: 500,
@@ -481,6 +492,84 @@ export default function AdminPage() {
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* EMAIL CONFIG */}
+          {tab === 'Email' && (
+            <div style={{ display: 'grid', gridTemplateColumns: editingEmail ? '1fr 480px' : '1fr', gap: 20, alignItems: 'start' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ background: 'white', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                  <div style={{ padding: '14px 20px', borderBottom: '0.5px solid rgba(60,60,67,0.18)' }}>
+                    <div style={{ fontWeight: 700, fontSize: 15, color: '#000000' }}>Notification Events</div>
+                    <div style={{ fontSize: 11, color: '#8E8E93', marginTop: 2 }}>Click an event to configure recipients and email template</div>
+                  </div>
+                  {emailConfigs.length === 0 ? (
+                    <div style={{ padding: '24px 20px', color: '#8E8E93', fontSize: 13 }}>
+                      No email config found. Run the schema SQL in Supabase to create the email_config table.
+                    </div>
+                  ) : emailConfigs.map((cfg, i) => (
+                    <div key={cfg.event} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: i < emailConfigs.length - 1 ? '0.5px solid rgba(60,60,67,0.1)' : 'none', background: editingEmail?.event === cfg.event ? '#FFF5F0' : 'white' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: cfg.enabled ? '#30D158' : '#C7C7CC', flexShrink: 0 }} />
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontWeight: 600, fontSize: 13, color: '#000000' }}>{cfg.label}</div>
+                          <div style={{ fontSize: 11, color: '#8E8E93', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {cfg.recipients ? cfg.recipients : <span style={{ fontStyle: 'italic' }}>No recipients set</span>}
+                          </div>
+                        </div>
+                      </div>
+                      <button onClick={() => setEditingEmail({ ...cfg })} style={{ fontSize: 12, color: '#E84A0C', background: '#FFF5F0', border: 'none', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontWeight: 600, flexShrink: 0, fontFamily: SF }}>
+                        {editingEmail?.event === cfg.event ? 'Editing' : 'Edit'}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ background: '#F8F4FF', border: '1px solid #E2D9F3', borderRadius: 12, padding: '14px 16px', fontSize: 12, color: '#5E35B1', lineHeight: 1.6 }}>
+                  <div style={{ fontWeight: 700, marginBottom: 6 }}>Available template variables:</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px' }}>
+                    {['{{student_name}}', '{{counsellor_name}}', '{{category}}', '{{date}}', '{{location}}', '{{notes}}', '{{decline_reason}}', '{{portal_url}}'].map(v => (
+                      <code key={v} style={{ background: 'rgba(94,53,177,0.1)', borderRadius: 4, padding: '1px 5px', fontSize: 11 }}>{v}</code>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {editingEmail && (
+                <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', padding: 22, position: 'sticky', top: 70 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+                    <div style={{ fontWeight: 700, fontSize: 15, color: '#000000' }}>{editingEmail.label}</div>
+                    <button onClick={() => setEditingEmail(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#8E8E93', lineHeight: 1 }}>×</button>
+                  </div>
+                  <form onSubmit={saveEmailConfig} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <label className="label" style={{ margin: 0 }}>Enabled</label>
+                      <button type="button" onClick={() => setEditingEmail({ ...editingEmail, enabled: !editingEmail.enabled })} style={{ width: 44, height: 26, borderRadius: 13, border: 'none', cursor: 'pointer', background: editingEmail.enabled ? '#30D158' : '#C7C7CC', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
+                        <span style={{ position: 'absolute', top: 3, left: editingEmail.enabled ? 21 : 3, width: 20, height: 20, borderRadius: 10, background: 'white', transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
+                      </button>
+                    </div>
+                    <div>
+                      <label className="label">Recipients <span style={{ color: '#8E8E93', textTransform: 'none', fontWeight: 400, letterSpacing: 0 }}>(comma-separated)</span></label>
+                      <input type="text" className="input" style={{ marginTop: 6 }} value={editingEmail.recipients || ''} onChange={e => setEditingEmail({ ...editingEmail, recipients: e.target.value })} placeholder="admin@example.com, hr@example.com" />
+                    </div>
+                    <div>
+                      <label className="label">Subject</label>
+                      <input type="text" className="input" style={{ marginTop: 6 }} value={editingEmail.subject || ''} onChange={e => setEditingEmail({ ...editingEmail, subject: e.target.value })} placeholder="Email subject…" />
+                    </div>
+                    <div>
+                      <label className="label">Body</label>
+                      <textarea className="input" style={{ marginTop: 6 }} rows={10} value={editingEmail.body || ''} onChange={e => setEditingEmail({ ...editingEmail, body: e.target.value })} placeholder="Email body… Use {{variables}} as placeholders." />
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button type="submit" disabled={submitting} style={{ flex: 1, background: '#E84A0C', color: 'white', border: 'none', borderRadius: 9, height: 42, fontWeight: 600, fontSize: 13, cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.6 : 1 }}>
+                        {submitting ? 'Saving…' : 'Save Template'}
+                      </button>
+                      <button type="button" onClick={() => setEditingEmail(null)} style={{ background: '#F2F2F7', color: '#3C3C43', border: 'none', borderRadius: 9, height: 42, padding: '0 16px', fontSize: 13, cursor: 'pointer' }}>Cancel</button>
+                    </div>
+                  </form>
                 </div>
               )}
             </div>

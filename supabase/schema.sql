@@ -73,6 +73,28 @@ CREATE TABLE IF NOT EXISTS referrals (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Email notification config
+CREATE TABLE IF NOT EXISTS email_config (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  event TEXT NOT NULL UNIQUE,
+  label TEXT NOT NULL,
+  recipients TEXT DEFAULT '',
+  subject TEXT DEFAULT '',
+  body TEXT DEFAULT '',
+  enabled BOOLEAN DEFAULT TRUE,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Seed default email events
+INSERT INTO email_config (event, label, subject, body) VALUES
+  ('session_created',    'New Session Request',   'New counselling request from {{student_name}}',      'Hi,\n\nA new counselling session has been requested.\n\nStudent: {{student_name}}\nCategory: {{category}}\nNotes: {{notes}}\n\nPlease log in to the portal to accept or decline.\n\n{{portal_url}}'),
+  ('session_accepted',   'Session Accepted',      'Your counselling session has been scheduled',         'Hi {{student_name}},\n\nYour counselling session has been accepted.\n\nCounsellor: {{counsellor_name}}\nDate & Time: {{date}}\nLocation: {{location}}\n\n{{portal_url}}'),
+  ('session_declined',   'Session Declined',      'Update on your counselling request',                  'Hi {{student_name}},\n\nUnfortunately your counselling session request has been declined.\n\nReason: {{decline_reason}}\n\nYou can re-open your request from the portal.\n\n{{portal_url}}'),
+  ('session_rescheduled','Session Rescheduled',   'Your session has been rescheduled',                   'Hi {{student_name}},\n\nYour counselling session has been rescheduled.\n\nNew Date & Time: {{date}}\nLocation: {{location}}\n\n{{portal_url}}'),
+  ('session_completed',  'Session Completed',     'Counselling session completed',                       'Hi {{student_name}},\n\nYour counselling session has been marked as completed.\n\nCounsellor: {{counsellor_name}}\nCategory: {{category}}\n\nThank you for using the counselling portal.\n\n{{portal_url}}'),
+  ('session_reopened',   'Session Re-opened',     'A counselling session has been re-opened',            'Hi,\n\nA counselling session has been re-opened by the student.\n\nStudent: {{student_name}}\nCategory: {{category}}\nNotes: {{notes}}\n\nPlease log in to the portal to respond.\n\n{{portal_url}}')
+ON CONFLICT (event) DO NOTHING;
+
 -- Seed default categories
 INSERT INTO categories (name) VALUES
   ('Academic Stress'),
