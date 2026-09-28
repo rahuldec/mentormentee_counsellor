@@ -138,19 +138,19 @@ export default function CounsellorPage() {
             </div>
             <div>
               <div style={{ fontSize: 12.5, fontWeight: 600, color: '#FFFFFF' }}>{user?.name}</div>
-              <div style={{ fontSize: 10, color: '#8E8E93' }}>Counsellor</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>Counsellor</div>
             </div>
           </div>
         </div>
 
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <div style={{ color: '#4A6080', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '6px 12px 6px' }}>My Queue</div>
+          <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '6px 12px 6px' }}>My Queue</div>
           {['Pending', 'Upcoming'].map(t => (
             <button key={t} onClick={() => { setTab(t); setSidebarOpen(false); }} style={{
               height: 40, display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px',
               borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: 13.5, fontWeight: 500,
               background: tab === t ? '#E84A0C' : 'transparent',
-              color: tab === t ? '#FFFFFF' : '#8E8E93',
+              color: tab === t ? '#FFFFFF' : 'rgba(255,255,255,0.7)',
               fontFamily: SF, transition: 'all 0.15s', width: '100%', textAlign: 'left',
             }}>
               <span style={{ width: 18, textAlign: 'center', fontSize: 13 }}>
@@ -162,13 +162,13 @@ export default function CounsellorPage() {
               )}
             </button>
           ))}
-          <div style={{ color: '#4A6080', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '12px 12px 6px' }}>History</div>
+          <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '12px 12px 6px' }}>History</div>
           {['Completed', 'All'].map(t => (
             <button key={t} onClick={() => { setTab(t); setSidebarOpen(false); }} style={{
               height: 40, display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px',
               borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: 13.5, fontWeight: 500,
               background: tab === t ? '#E84A0C' : 'transparent',
-              color: tab === t ? '#FFFFFF' : '#8E8E93',
+              color: tab === t ? '#FFFFFF' : 'rgba(255,255,255,0.7)',
               fontFamily: SF, transition: 'all 0.15s', width: '100%', textAlign: 'left',
             }}>
               <span style={{ width: 18, textAlign: 'center', fontSize: 13 }}>
@@ -190,7 +190,7 @@ export default function CounsellorPage() {
             { label: 'Upcoming', value: upcomingCount,     color: '#30D158' },
           ].map(s => (
             <div key={s.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '5px 12px' }}>
-              <span style={{ fontSize: 12, color: '#8E8E93' }}>{s.label}</span>
+              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{s.label}</span>
               <span style={{ fontSize: 13, fontWeight: 700, color: s.color }}>{s.value}</span>
             </div>
           ))}

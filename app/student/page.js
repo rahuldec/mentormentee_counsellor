@@ -109,13 +109,13 @@ export default function StudentPage() {
             </div>
             <div>
               <div style={{ fontSize: 12.5, fontWeight: 600, color: '#FFFFFF' }}>{user?.name}</div>
-              <div style={{ fontSize: 10, color: '#8E8E93', textTransform: 'capitalize' }}>{user?.role}</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'capitalize' }}>{user?.role}</div>
             </div>
           </div>
         </div>
 
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <div style={{ color: '#4A6080', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '6px 12px 6px' }}>My Counselling</div>
+          <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '6px 12px 6px' }}>My Counselling</div>
           {NAV.map(n => (
             <button key={n.key} onClick={() => { setTab(n.key); setSidebarOpen(false); }} style={{
               height: 40, display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px',
@@ -142,7 +142,7 @@ export default function StudentPage() {
               { label: 'Pending',   value: pending,         color: '#FFD60A' },
             ].map(s => (
               <div key={s.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '5px 12px' }}>
-                <span style={{ fontSize: 12, color: '#8E8E93' }}>{s.label}</span>
+                <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{s.label}</span>
                 <span style={{ fontSize: 13, fontWeight: 700, color: s.color }}>{s.value}</span>
               </div>
             ))}
