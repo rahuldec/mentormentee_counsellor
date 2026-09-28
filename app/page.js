@@ -55,12 +55,10 @@ export default function Home() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#FEF6EE', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+    <div style={{ minHeight: '100vh', background: '#F5F5F5', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       {/* Brand mark */}
       <div style={{ marginBottom: 24, textAlign: 'center' }}>
-        <div style={{ width: 56, height: 56, borderRadius: 18, background: 'linear-gradient(135deg, #E84A0C, #F97316)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', boxShadow: '0 4px 16px rgba(232,74,12,0.35)' }}>
-          <svg width="28" height="28" fill="none" stroke="white" viewBox="0 0 24 24" strokeWidth="2.2"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-        </div>
+        <img src="https://okiedokie-erp-images.s3.ap-south-1.amazonaws.com/Okie%20Dokie/2025/12/sourceURL/26aebcbe10f4ac5a3e8b-611ed1b9032568edd4f3-Okie_Dokie_App_icon__2___2_-removebg-preview.png" alt="OkieDokie" style={{ width: 64, height: 64, borderRadius: 18, objectFit: 'contain', background: 'white', padding: 6, margin: '0 auto 12px', display: 'block', boxShadow: '0 4px 16px rgba(232,74,12,0.2)' }} />
         <div style={{ fontSize: 22, fontWeight: 800, color: '#1A1A1A', letterSpacing: '-0.3px' }}>Counselling Portal</div>
         <div style={{ fontSize: 13, color: '#B8A99A', marginTop: 3 }}>Student & Staff Wellbeing</div>
       </div>

@@ -126,7 +126,7 @@ export default function CounsellorPage() {
         {/* Profile */}
         <div style={{ padding: '4px 10px 22px', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 20, background: 'linear-gradient(135deg, #E84A0C, #FF6B35)', display: 'grid', placeItems: 'center', fontSize: 18, flexShrink: 0 }}>🧠</div>
+            <img src="https://okiedokie-erp-images.s3.ap-south-1.amazonaws.com/Okie%20Dokie/2025/12/sourceURL/26aebcbe10f4ac5a3e8b-611ed1b9032568edd4f3-Okie_Dokie_App_icon__2___2_-removebg-preview.png" alt="OkieDokie" style={{ width: 40, height: 40, borderRadius: 12, flexShrink: 0, objectFit: 'contain', background: 'white', padding: 3 }} />
             <div>
               <div style={{ fontWeight: 600, fontSize: 14, color: '#FFFFFF', letterSpacing: '-0.2px' }}>{user?.name}</div>
               <div style={{ fontSize: 11, color: '#8E8E93', marginTop: 2 }}>Counsellor</div>
