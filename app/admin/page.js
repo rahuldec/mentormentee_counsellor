@@ -124,7 +124,7 @@ export default function AdminPage() {
       {/* SIDEBAR */}
       <aside style={{
         position: 'fixed', left: 0, top: 0, width: 240, height: '100vh',
-        background: '#1C1C1E', color: 'white', display: 'flex', flexDirection: 'column',
+        background: '#1A2540', color: 'white', display: 'flex', flexDirection: 'column',
         zIndex: 40, padding: '20px 10px',
       }}
         className="admin-sidebar"
@@ -141,7 +141,7 @@ export default function AdminPage() {
         </div>
 
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <div style={{ color: '#48484A', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '6px 12px 6px' }}>Operations</div>
+          <div style={{ color: '#4A6080', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '6px 12px 6px' }}>Operations</div>
           {[{ key: 'Sessions', icon: '◷', label: 'Sessions' }, { key: 'Reports', icon: '▥', label: 'Reports' }].map(n => (
             <button key={n.key} onClick={() => { setTab(n.key); setSidebarOpen(false); }} style={{
               height: 40, display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px',
@@ -153,11 +153,11 @@ export default function AdminPage() {
               <span style={{ width: 18, textAlign: 'center', fontSize: 14 }}>{n.icon}</span>
               <span>{n.label}</span>
               {n.key === 'Sessions' && pending > 0 && (
-                <span style={{ marginLeft: 'auto', background: tab === 'Sessions' ? 'rgba(255,255,255,0.25)' : '#3A3A3C', color: 'white', fontSize: 11, fontWeight: 700, borderRadius: 8, padding: '1px 7px' }}>{pending}</span>
+                <span style={{ marginLeft: 'auto', background: tab === 'Sessions' ? 'rgba(255,255,255,0.25)' : '#253451', color: 'white', fontSize: 11, fontWeight: 700, borderRadius: 8, padding: '1px 7px' }}>{pending}</span>
               )}
             </button>
           ))}
-          <div style={{ color: '#48484A', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '12px 12px 6px' }}>Administration</div>
+          <div style={{ color: '#4A6080', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '12px 12px 6px' }}>Administration</div>
           {[{ key: 'Counsellors', icon: '👤', label: 'Counsellors' }, { key: 'Categories', icon: '🏷️', label: 'Categories' }, { key: 'Mapping', icon: '⇄', label: 'Mapping' }].map(n => (
             <button key={n.key} onClick={() => { setTab(n.key); setSidebarOpen(false); }} style={{
               height: 40, display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px',
@@ -195,7 +195,7 @@ export default function AdminPage() {
           padding: '0 24px', position: 'sticky', top: 0, zIndex: 10,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <button onClick={() => setSidebarOpen(o => !o)} className="hamburger" style={{ display: 'none', background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#1C1C1E', padding: 4 }}>☰</button>
+            <button onClick={() => setSidebarOpen(o => !o)} className="hamburger" style={{ display: 'none', background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#1A2540', padding: 4 }}>☰</button>
             <div>
               <div style={{ fontWeight: 700, fontSize: 17, color: '#000000', letterSpacing: '-0.4px' }}>{tab}</div>
               <div style={{ fontSize: 11, color: '#8E8E93', marginTop: 1 }}>{sessions.length} total sessions · {counsellors.length} counsellors</div>

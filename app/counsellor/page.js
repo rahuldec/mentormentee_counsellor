@@ -121,7 +121,7 @@ export default function CounsellorPage() {
       {sidebarOpen && <div onClick={() => setSidebarOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 30 }} />}
 
       {/* SIDEBAR */}
-      <aside style={{ position: 'fixed', left: 0, top: 0, width: 230, height: '100vh', background: '#1C1C1E', display: 'flex', flexDirection: 'column', zIndex: 40, padding: '20px 10px' }} className="co-sidebar">
+      <aside style={{ position: 'fixed', left: 0, top: 0, width: 230, height: '100vh', background: '#1A2540', display: 'flex', flexDirection: 'column', zIndex: 40, padding: '20px 10px' }} className="co-sidebar">
 
         {/* Brand */}
         <div style={{ padding: '4px 10px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: 14 }}>
@@ -133,7 +133,7 @@ export default function CounsellorPage() {
             </div>
           </div>
           <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 8, background: '#3A3A3C', color: '#E84A0C', fontSize: 11, fontWeight: 700, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+            <div style={{ width: 28, height: 28, borderRadius: 8, background: '#253451', color: '#E84A0C', fontSize: 11, fontWeight: 700, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
               {(user?.name || '?')[0].toUpperCase()}
             </div>
             <div>
@@ -144,7 +144,7 @@ export default function CounsellorPage() {
         </div>
 
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <div style={{ color: '#48484A', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '6px 12px 6px' }}>My Queue</div>
+          <div style={{ color: '#4A6080', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '6px 12px 6px' }}>My Queue</div>
           {['Pending', 'Upcoming'].map(t => (
             <button key={t} onClick={() => { setTab(t); setSidebarOpen(false); }} style={{
               height: 40, display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px',
@@ -158,11 +158,11 @@ export default function CounsellorPage() {
               </span>
               <span>{t}</span>
               {tabCount[t] > 0 && (
-                <span style={{ marginLeft: 'auto', background: tab === t ? 'rgba(255,255,255,0.25)' : '#3A3A3C', color: tab === t ? 'white' : '#8E8E93', fontSize: 11, fontWeight: 700, borderRadius: 8, padding: '1px 7px' }}>{tabCount[t]}</span>
+                <span style={{ marginLeft: 'auto', background: tab === t ? 'rgba(255,255,255,0.25)' : '#253451', color: tab === t ? 'white' : '#8E8E93', fontSize: 11, fontWeight: 700, borderRadius: 8, padding: '1px 7px' }}>{tabCount[t]}</span>
               )}
             </button>
           ))}
-          <div style={{ color: '#48484A', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '12px 12px 6px' }}>History</div>
+          <div style={{ color: '#4A6080', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '12px 12px 6px' }}>History</div>
           {['Completed', 'All'].map(t => (
             <button key={t} onClick={() => { setTab(t); setSidebarOpen(false); }} style={{
               height: 40, display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px',
@@ -176,7 +176,7 @@ export default function CounsellorPage() {
               </span>
               <span>{t}</span>
               {tabCount[t] > 0 && (
-                <span style={{ marginLeft: 'auto', background: tab === t ? 'rgba(255,255,255,0.25)' : '#3A3A3C', color: tab === t ? 'white' : '#8E8E93', fontSize: 11, fontWeight: 700, borderRadius: 8, padding: '1px 7px' }}>{tabCount[t]}</span>
+                <span style={{ marginLeft: 'auto', background: tab === t ? 'rgba(255,255,255,0.25)' : '#253451', color: tab === t ? 'white' : '#8E8E93', fontSize: 11, fontWeight: 700, borderRadius: 8, padding: '1px 7px' }}>{tabCount[t]}</span>
               )}
             </button>
           ))}
@@ -202,7 +202,7 @@ export default function CounsellorPage() {
 
         {/* TOPBAR */}
         <header style={{ height: 56, background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '0.5px solid rgba(60,60,67,0.18)', display: 'flex', alignItems: 'center', padding: '0 24px', position: 'sticky', top: 0, zIndex: 10, gap: 12 }}>
-          <button onClick={() => setSidebarOpen(o => !o)} className="co-hamburger" style={{ display: 'none', background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#1C1C1E', padding: 4 }}>☰</button>
+          <button onClick={() => setSidebarOpen(o => !o)} className="co-hamburger" style={{ display: 'none', background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#1A2540', padding: 4 }}>☰</button>
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 700, fontSize: 17, color: '#000000', letterSpacing: '-0.4px' }}>{tab} Sessions</div>
             <div style={{ fontSize: 11, color: '#8E8E93', marginTop: 1 }}>{filtered.length} session{filtered.length !== 1 ? 's' : ''}</div>
