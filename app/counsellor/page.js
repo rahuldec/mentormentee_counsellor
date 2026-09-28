@@ -41,8 +41,32 @@ export default function CounsellorPage() {
 
   async function loadSessions(cid) {
     setLoading(true);
-    const res = await fetch(`/api/sessions?counsellor_id=${cid}`);
-    setSessions(await res.json());
+    // Load sessions assigned to this counsellor + unassigned sessions in their mapped categories
+    const [assignedRes, categoriesRes] = await Promise.all([
+      fetch(`/api/sessions?counsellor_id=${cid}`),
+      fetch(`/api/categories`),
+    ]);
+    const assigned = await assignedRes.json();
+    const categories = await categoriesRes.json();
+
+    // Find categories mapped to this counsellor
+    const myCategoryIds = categories
+      .filter(cat => cat.category_counsellor_map?.some(m => m.counsellor_id === cid))
+      .map(cat => cat.id);
+
+    // Fetch unassigned sessions in those categories
+    let unassigned = [];
+    if (myCategoryIds.length > 0) {
+      const unassignedRes = await fetch(`/api/sessions?unassigned=true&category_ids=${myCategoryIds.join(',')}`);
+      unassigned = await unassignedRes.json();
+    }
+
+    // Merge, deduplicate by id
+    const merged = [...assigned];
+    unassigned.forEach(s => {
+      if (!merged.find(m => m.id === s.id)) merged.push(s);
+    });
+    setSessions(merged);
     setLoading(false);
   }
 

@@ -8,6 +8,9 @@ export async function GET(req) {
   const counsellor_id = searchParams.get('counsellor_id');
   const status = searchParams.get('status');
 
+  const unassigned = searchParams.get('unassigned');
+  const category_ids = searchParams.get('category_ids');
+
   let query = supabaseAdmin
     .from('sessions')
     .select('*, categories(name), counsellors(id, name, email, mobile), remarks(counsellor_wellbeing_score, student_wellbeing_score, counsellor_notes, student_notes)')
@@ -16,6 +19,9 @@ export async function GET(req) {
   if (requester_id) query = query.eq('requester_id', requester_id);
   if (counsellor_id) query = query.eq('counsellor_id', counsellor_id);
   if (status) query = query.eq('status', status);
+  if (unassigned === 'true' && category_ids) {
+    query = query.is('counsellor_id', null).in('category_id', category_ids.split(','));
+  }
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
