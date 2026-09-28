@@ -16,7 +16,7 @@ export async function GET(req, { params }) {
 export async function PUT(req, { params }) {
   const { id } = params;
   const body = await req.json();
-  const { action, scheduled_at, location, decline_reason, counsellor_id } = body;
+  const { action, scheduled_at, location, decline_reason, counsellor_id, requester_notes } = body;
 
   // Fetch current session
   const { data: session } = await supabaseAdmin
@@ -45,6 +45,7 @@ export async function PUT(req, { params }) {
     updates.status = 'completed';
   } else if (action === 'reopen') {
     updates.status = 'reopened';
+    if (requester_notes) updates.requester_notes = requester_notes;
   } else if (action === 'reassign') {
     updates.counsellor_id = counsellor_id;
   }

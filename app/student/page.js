@@ -26,6 +26,8 @@ export default function StudentPage() {
   const [form, setForm]         = useState({ category_id: '', notes: '' });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError]       = useState('');
+  const [reopenModal, setReopenModal] = useState(null); // session to reopen
+  const [reopenNotes, setReopenNotes] = useState('');
 
   useEffect(() => {
     const uid = sessionStorage.getItem('user_id');
@@ -57,12 +59,14 @@ export default function StudentPage() {
     setShowForm(false); setForm({ category_id: '', notes: '' }); loadData(user.id); setSubmitting(false);
   }
 
-  async function reopenSession(session) {
-    const res = await fetch('/api/sessions', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ requester_id: user.id, requester_name: user.name, requester_email: user.email, requester_type: user.role, category_id: session.category_id, requester_notes: 'Re-opened from previous session', parent_session_id: session.id }),
+  async function reopenSession() {
+    setSubmitting(true);
+    await fetch(`/api/sessions/${reopenModal.id}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'reopen', requester_notes: reopenNotes }),
     });
-    if (res.ok) loadData(user.id);
+    setReopenModal(null); setReopenNotes(''); setSubmitting(false);
+    loadData(user.id);
   }
 
   if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}><div className="spinner" /></div>;
@@ -191,7 +195,7 @@ export default function StudentPage() {
                 )}
 
                 {(s.status === 'completed' || s.status === 'declined') && (
-                  <button onClick={() => reopenSession(s)} style={{ marginTop: 10, fontSize: 12, fontWeight: 600, color: '#4F46E5', background: '#EEF2FF', border: 'none', borderRadius: 8, padding: '7px 14px', cursor: 'pointer' }}>
+                  <button onClick={() => { setReopenModal(s); setReopenNotes(''); }} style={{ marginTop: 10, fontSize: 12, fontWeight: 600, color: '#EC4899', background: '#FDF2F8', border: '1px solid #FBCFE8', borderRadius: 8, padding: '7px 14px', cursor: 'pointer' }}>
                     ↩ Re-open Session
                   </button>
                 )}
@@ -200,6 +204,47 @@ export default function StudentPage() {
           </div>
         )}
       </div>
+
+      {/* Re-open Modal */}
+      {reopenModal && (
+        <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) setReopenModal(null); }}>
+          <div className="modal">
+            <div style={{ fontWeight: 700, fontSize: 17, color: '#1E2A3B', marginBottom: 4 }}>Re-open Session</div>
+            <div style={{ fontSize: 13, color: '#94A3B8', marginBottom: 6 }}>{reopenModal.categories?.name}</div>
+
+            {/* Show previous session details for reference */}
+            {reopenModal.scheduled_at && (
+              <div style={{ background: '#F8FAFC', borderRadius: 10, padding: '10px 12px', marginBottom: 16, fontSize: 12, color: '#475569' }}>
+                <div style={{ fontWeight: 600, marginBottom: 4, fontSize: 11, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Previous session</div>
+                <div>📅 {format(new Date(reopenModal.scheduled_at), 'dd MMM yyyy, hh:mm a')}</div>
+                {reopenModal.location && <div>📍 {reopenModal.location}</div>}
+              </div>
+            )}
+
+            <div style={{ marginBottom: 16 }}>
+              <label className="label" style={{ marginBottom: 6 }}>Reason for re-opening (optional)</label>
+              <textarea
+                className="input"
+                rows={3}
+                value={reopenNotes}
+                onChange={e => setReopenNotes(e.target.value)}
+                placeholder="What would you like to discuss in the follow-up session?"
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                onClick={reopenSession}
+                disabled={submitting}
+                style={{ flex: 1, background: 'linear-gradient(135deg, #DB2777, #EC4899)', color: 'white', fontWeight: 600, borderRadius: 12, padding: '11px 0', fontSize: 14, border: 'none', cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.6 : 1 }}
+              >
+                {submitting ? 'Re-opening...' : '↩ Re-open'}
+              </button>
+              <button className="btn-ghost" onClick={() => setReopenModal(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
